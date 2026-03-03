@@ -38,7 +38,7 @@ jobs:
           name: proton-tkg-build-lina-unity-leak-patch
           path: proton-tkg/built/*.tar
 
-release:
+  release:
     runs-on: ubuntu-latest
     needs: [build]
     steps:
