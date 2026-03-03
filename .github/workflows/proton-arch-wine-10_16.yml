@@ -1,4 +1,4 @@
-name: Proton nopackage Arch Linux - Wine 10.20
+name: Proton - Wine 10.16 - Lina Unity Leak Patch
 
 on:
   workflow_dispatch:
