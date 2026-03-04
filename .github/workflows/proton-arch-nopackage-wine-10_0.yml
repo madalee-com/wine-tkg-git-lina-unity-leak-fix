@@ -22,7 +22,7 @@ jobs:
           sed -i 's/uninstaller="false"/uninstaller="true"/' proton-tkg.cfg
           sed -i 's/autoinstall="false"/autoinstall="true"/' proton-tkg.cfg
           sed -i 's/LOCAL_PRESET=""/LOCAL_PRESET="none"/' proton-tkg.cfg
-          sed -i 's/_use_GE_patches="true"/_use_GE_patches="false"/' proton-tkg.cfg
+          sed -i 's/_use_GE_patches="true"/_use_GE_patches="true"/' proton-tkg.cfg
           sed -i 's/_GE_WAYLAND="true"/_GE_WAYLAND="false"/' proton-tkg.cfg
           sed -i 's/_proton_mf_patches="true"/_proton_mf_patches="true"/' proton-tkg.cfg
           sed -i 's/_protonify="true"/_protonify="true"/' proton-tkg.cfg
