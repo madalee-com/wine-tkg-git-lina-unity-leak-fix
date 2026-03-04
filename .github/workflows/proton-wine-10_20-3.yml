@@ -37,14 +37,14 @@ jobs:
           echo _childwindow_fix="true" >> proton-tkg.cfg
           #sed -i '/_community_patches/c\_community_patches=""' proton-tkg.cfg
           sed -i 's/_no_container="false"/_no_container="true"/' proton-tkg.sh
-          echo _PKGNAME_OVERRIDE="tkg-10_20-lina-unity-leak-patch" >> proton-tkg.cfg
-          echo _nomakepkg_nover="true" >> proton-tkg.cfg
+          echo _PROTON_NAME_ADDON="lina-unity-leak-patch" >> proton-tkg.cfg
           yes|./proton-tkg.sh
       - name: Archive the artifacts
         uses: actions/upload-artifact@v4
         with:
           name: proton-tkg-build
           path: proton-tkg/built
+          compression-level: 9
 
   release:
     runs-on: ubuntu-latest
