@@ -1,4 +1,4 @@
-name: Proton - Wine 10.20 - 1 - Lina Unity Leak Patch
+name: Proton - Wine 10.20 - 2 - Lina Unity Leak Patch
 
 on:
   workflow_dispatch:
