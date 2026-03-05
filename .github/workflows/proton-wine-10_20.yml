@@ -42,12 +42,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Proton-Wine-10_20-Lina-Unity-Leak-Patch
-          path: proton-tkg/built/Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz
+          path: proton-tkg/Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz
       - name: Archive tar sha512sum
         uses: actions/upload-artifact@v4
         with:
           name: Proton-Wine-10_20-Lina-Unity-Leak-Patch-sha512sum
-          path: proton-tkg/built/Proton-Wine-10_20-Lina-Unity-Leak-Patch.sha512sum
+          path: proton-tkg/Proton-Wine-10_20-Lina-Unity-Leak-Patch.sha512sum
 
 
   release:
