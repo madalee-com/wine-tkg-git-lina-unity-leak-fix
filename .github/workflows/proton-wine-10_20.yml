@@ -22,7 +22,8 @@ jobs:
           sed -i 's/uninstaller="false"/uninstaller="true"/' proton-tkg.cfg
           sed -i 's/autoinstall="false"/autoinstall="true"/' proton-tkg.cfg
           sed -i 's/LOCAL_PRESET=""/LOCAL_PRESET="none"/' proton-tkg.cfg
-          sed -i 's/_use_GE_patches="true"/_use_GE_patches="true"/' proton-tkg.cfg
+          sed -i 's/_use_GE_patches="true"/_use_GE_patches="false"/' proton-tkg.cfg
+          sed -i 's/_GE_WAYLAND="true"/_GE_WAYLAND="false"/' proton-tkg.cfg
           sed -i 's/_proton_mf_patches="true"/_proton_mf_patches="true"/' proton-tkg.cfg
           sed -i 's/_protonify="true"/_protonify="true"/' proton-tkg.cfg
           sed -i 's/build_gstreamer="false"/build_gstreamer="true"/' proton-tkg.cfg
@@ -38,7 +39,9 @@ jobs:
           sed -i 's/_no_container="false"/_no_container="true"/' proton-tkg.sh
           sed -i 's/_PROTON_NAME_ADDON=""/_PROTON_NAME_ADDON="lina-unity-leak-patch"/' proton-tkg-profiles/advanced-customization.cfg
           yes|./proton-tkg.sh
-          tar -cvzf Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz built/
+          cd built
+          tar -cvzf ../Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz ./
+          cd ..
           sha512sum Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz > Proton-Wine-10_20-Lina-Unity-Leak-Patch.sha512sum
       - name: Archive tar gz
         uses: actions/upload-artifact@v4
