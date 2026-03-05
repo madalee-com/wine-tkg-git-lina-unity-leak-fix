@@ -37,7 +37,7 @@ jobs:
           sed -i 's/_PROTON_NAME_ADDON=""/_PROTON_NAME_ADDON="lina-unity-leak-patch"/' proton-tkg-profiles/advanced-customization.cfg
           yes|./proton-tkg.sh
           tar -cvzf Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz built/
-	        sha512sum Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz > Proton-Wine-10_20-Lina-Unity-Leak-Patch.sha512sum
+          sha512sum Proton-Wine-10_20-Lina-Unity-Leak-Patch.tar.gz > Proton-Wine-10_20-Lina-Unity-Leak-Patch.sha512sum
       - name: Archive tar gz
         uses: actions/upload-artifact@v4
         with:
