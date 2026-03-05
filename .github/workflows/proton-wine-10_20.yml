@@ -30,6 +30,8 @@ jobs:
           sed -i 's/wayland_driver="false"/wayland_driver="false"/' proton-tkg.cfg
           sed -i 's/_plain_version=""/_plain_version="refs\/tags\/wine-10.20"/' proton-tkg.cfg
           sed -i 's/_use_staging="true"/_use_staging="false"/' proton-tkg.cfg
+          sed -i 's/_proton_fs_hack="true"/_proton_fs_hack="false"/' proton-tkg.cfg
+          sed -i 's/_use_josh_flat_theme="true"/_use_josh_flat_theme="false"/' proton-tkg.cfg
           echo _win10_default="true" >> proton-tkg.cfg
           echo _childwindow_fix="true" >> proton-tkg.cfg
           echo _proton_nvapi_disable="true" >> proton-tkg.cfg
