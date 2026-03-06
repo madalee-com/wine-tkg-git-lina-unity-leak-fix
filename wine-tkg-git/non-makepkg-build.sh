@@ -285,7 +285,7 @@ build_wine_tkg() {
   if ( [ "$_unfrog" != "true" ] && cd "${srcdir}"/"${_winesrcdir}" && git merge-base --is-ancestor 8c3f205696571558a6fae42314370fbd7cc14a12 HEAD ); then
     local _new_makefiles="true"
   else
-    local _new_makefiles="true"
+    local _new_makefiles="false"
   fi
 
   pkgver=$(pkgver)
@@ -312,16 +312,16 @@ build_wine_tkg() {
     if [ "$_new_makefiles" = "true" ]; then
       local _lib32name="lib"
     else
-      local _lib32name="lib32"
+      local _lib32name="lib"
     fi
     local _lib64name="lib"
   else
     if [ "$_new_makefiles" = "true" ]; then
-      local _lib32name="lib64"
+      local _lib32name="lib"
     else
       local _lib32name="lib"
     fi
-    local _lib64name="lib64"
+    local _lib64name="lib"
   fi
 
   # configure args
