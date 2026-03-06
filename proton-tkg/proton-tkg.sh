@@ -955,7 +955,7 @@ else
       _lib64name="lib"
     else
       _lib32name="lib"
-      _lib64name="lib"
+      _lib64name="lib64"
     fi
 
     # Prompt to re-use existing gst
