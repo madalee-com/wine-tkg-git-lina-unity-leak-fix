@@ -26,8 +26,7 @@ jobs:
           sed -i 's/wayland_driver="false"/wayland_driver="true"/' proton-tkg.cfg
           sed -i 's/_sdl_joy_support="false"/_sdl_joy_support="true"/' proton-tkg-profiles/advanced-customization.cfg
 
-          sed -i 's/_nosteamruntime="false"/_nosteamruntime="sniper"/' proton-tkg-profiles/advanced-customization.cfg
-          sed -i 's/_steamvr_support="true"/_steamvr_support="false"/' proton-tkg-profiles/advanced-customization.cfg
+          sed -i 's/_proton_use_steamhelper="true"/_proton_use_steamhelper="false"/' proton-tkg-profiles/advanced-customization.cfg
           
           echo _proton_nvapi_disable="true" >> proton-tkg.cfg
           sed -i 's/_no_container="false"/_no_container="true"/' proton-tkg.sh
