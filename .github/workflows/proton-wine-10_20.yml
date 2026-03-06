@@ -35,6 +35,7 @@ jobs:
           sed -i 's/_use_josh_flat_theme="true"/_use_josh_flat_theme="false"/' proton-tkg.cfg
           sed -i 's/_build_mediaconv="true"/_build_mediaconv="false"/' proton-tkg.cfg
           sed -i 's/_NOLIB32="false"/_NOLIB32="wow64"/' proton-tkg-profiles/advanced-customization.cfg
+          sed -i 's/_NOCCACHE="false"/_NOCCACHE="true"/' proton-tkg-profiles/advanced-customization.cfg
           sed -i '/_community_patches/c\_community_patches=""' proton-tkg.cfg
           #echo _win10_default="true" >> proton-tkg.cfg
           echo _childwindow_fix="true" >> proton-tkg.cfg
