@@ -21,6 +21,7 @@ jobs:
           sed -i 's/LOCAL_PRESET=""/LOCAL_PRESET="valve-exp-bleeding"/' customization.cfg
           sed -i 's/_NOLIB32="false"/_NOLIB32="wow64"/' wine-tkg-profiles/advanced-customization.cfg
           echo '_ci_build="true"' >> customization.cfg
+          rm ../wine-tkg-git/wine-tkg-userpatches/lina-unity-leak.mypatch
           touch tarplz
           yes|./non-makepkg-build.sh
       - name: Archive the artifacts
