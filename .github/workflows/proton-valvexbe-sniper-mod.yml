@@ -1,4 +1,4 @@
-name: Proton valvexbe sniper container
+name: Proton Sniper Lina Unity Leak Patch
 
 on:
   workflow_dispatch:
