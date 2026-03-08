@@ -29,7 +29,9 @@ jobs:
           rm ../wine-tkg-git/wine-tkg-userpatches/lina-unity-leak.mypatch
           yes|./proton-tkg.sh
           cd built
+          cd proton_tkg_e*
           sed -i 's/# disable dxvknvapi for titles which dislike it/# disable dxvknvapi for titles which dislike it\n                "2079120", #Warudo/' proton
+          cd ..
           tar -cvzf ../Proton-Sniper-Lina-Unity-Leak-Patch.tar.gz ./
           cd ..
           sha512sum Proton-Sniper-Lina-Unity-Leak-Patch.tar.gz > Proton-Sniper-Lina-Unity-Leak-Patch.sha512sum
