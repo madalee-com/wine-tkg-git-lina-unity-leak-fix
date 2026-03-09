@@ -609,7 +609,9 @@ function build_steamhelper {
       mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
       cp -v Proton/build/steam.win32/steam.exe.fake proton_dist_tmp/$_lib32name/wine/fakedlls/steam.exe
       cp -v Proton/build/steam.win32/steam.exe.so proton_dist_tmp/$_lib32name/wine/
-      cp -v Proton/build/steam.win32/libsteam_api.so proton_dist_tmp/$_lib32name/
+      if [ -e Proton/build/steam.win32/libsteam_api.so ]; then
+        cp -v Proton/build/steam.win32/libsteam_api.so proton_dist_tmp/$_lib32name/
+      fi
     fi
   fi
 }
