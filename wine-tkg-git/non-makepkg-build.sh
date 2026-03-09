@@ -312,16 +312,16 @@ build_wine_tkg() {
     if [ "$_new_makefiles" = "true" ]; then
       local _lib32name="lib"
     else
-      local _lib32name="lib"
+      local _lib32name="lib32"
     fi
     local _lib64name="lib"
   else
     if [ "$_new_makefiles" = "true" ]; then
-      local _lib32name="lib"
+      local _lib32name="lib64"
     else
       local _lib32name="lib"
     fi
-    local _lib64name="lib"
+    local _lib64name="lib64"
   fi
 
   # configure args
