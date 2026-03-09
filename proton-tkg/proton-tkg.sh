@@ -265,8 +265,10 @@ function build_vrclient {
       fi
     fi
   else
+    mkdir -p proton_dist_tmp/$_lib64name/wine/fakedlls
     cp -v "${_nowhere}"/openvr/build/vrclient.win64/vrclient_x64/vrclient_x64.dll.so proton_dist_tmp/$_lib64name/wine/ && cp -v "${_nowhere}"/openvr/build/vrclient.win64/vrclient_x64.dll.fake proton_dist_tmp/$_lib64name/wine/fakedlls/vrclient_x64.dll
     if [ "$_NOLIB32" = "false" ]; then
+      mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
       cp -v "${_nowhere}"/openvr/build/vrclient.win32/vrclient/vrclient.dll.so proton_dist_tmp/$_lib32name/wine/ && cp -v "${_nowhere}"/openvr/build/vrclient.win32/vrclient.dll.fake proton_dist_tmp/$_lib32name/wine/fakedlls/vrclient.dll
     fi
   fi
@@ -347,6 +349,8 @@ function build_lsteamclient {
   else
     cp -v Proton/build/lsteamclient.win64/lsteamclient.dll.so proton_dist_tmp/$_lib64name/wine/
     cp -v Proton/build/lsteamclient.win32/lsteamclient.dll.so proton_dist_tmp/$_lib32name/wine/
+    mkdir -p proton_dist_tmp/$_lib64name/wine/fakedlls
+    mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
     cp -v Proton/build/lsteamclient.win64/lsteamclient.dll.fake proton_dist_tmp/$_lib64name/wine/fakedlls/lsteamclient.dll
     cp -v Proton/build/lsteamclient.win32/lsteamclient.dll.fake proton_dist_tmp/$_lib32name/wine/fakedlls/lsteamclient.dll
   fi
@@ -602,6 +606,7 @@ function build_steamhelper {
         cp -v Proton/build/steam.win64/64/libsteam_api.so proton_dist_tmp/$_lib64name/
       fi
     else
+      mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
       cp -v Proton/build/steam.win32/steam.exe.fake proton_dist_tmp/$_lib32name/wine/fakedlls/steam.exe
       cp -v Proton/build/steam.win32/steam.exe.so proton_dist_tmp/$_lib32name/wine/
       cp -v Proton/build/steam.win32/libsteam_api.so proton_dist_tmp/$_lib32name/
