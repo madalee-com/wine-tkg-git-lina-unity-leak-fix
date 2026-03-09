@@ -309,7 +309,7 @@ function build_lsteamclient {
   winemaker $WINEMAKERFLAGS --dll -DSTEAM_API_EXPORTS -Dprivate=public -Dprotected=public .
   sed -re 's@_LDFLAGS=@_LDFLAGS= -static-libgcc -static-libstdc++ -ldl @' -i "$_nowhere/Proton/build/lsteamclient.win64/Makefile"
   make -e CC="winegcc -m64" CXX="wineg++ -m64 $_cxx_addon" -C "$_nowhere/Proton/build/lsteamclient.win64" -j$(nproc) && strip --strip-debug lsteamclient.dll.so || exit 1
-  if [ "$_new_lib_paths_69" = "true" ]; then
+  if [ "$_new_lib_paths_69" != "true" ]; then
     touch "$_nowhere/Proton/build/lsteamclient.win64/steamclient.spec"
     winebuild --dll --fake-module -m64 -E "$_nowhere/Proton/build/lsteamclient.win64/steamclient.spec" --dll-name=lsteamclient -o lsteamclient.dll.fake || exit 1
   fi
@@ -321,7 +321,7 @@ function build_lsteamclient {
     sed -re 's@_LDFLAGS=@_LDFLAGS= -static-libgcc -static-libstdc++ -ldl @' -i "$_nowhere/Proton/build/lsteamclient.win32/Makefile"
     make -e CC="winegcc -m32" CXX="wineg++ -m32 $_cxx_addon" -C "$_nowhere/Proton/build/lsteamclient.win32" -j$(nproc) && strip --strip-debug lsteamclient.dll.so || exit 1
   fi
-  if [ "$_new_lib_paths_69" = "true" ]; then
+  if [ "$_new_lib_paths_69" != "true" ]; then
     touch "$_nowhere/Proton/build/lsteamclient.win32/steamclient.spec"
     winebuild --dll --fake-module -m32 -E "$_nowhere/Proton/build/lsteamclient.win32/steamclient.spec" --dll-name=lsteamclient -o lsteamclient.dll.fake || exit 1
   fi
@@ -551,7 +551,7 @@ function build_steamhelper {
       fi
     fi
 
-    if [ "$_new_lib_paths_69" = "true" ]; then
+    if [ "$_new_lib_paths_69" != "true" ]; then
       touch "$_nowhere/Proton/build/steam.win32/steam.spec"
       winebuild --exe --fake-module -m32 -E "$_nowhere/Proton/build/steam.win32/steam.spec" --dll-name=steam -o steam.exe.fake || exit 1
     fi
