@@ -44,7 +44,7 @@ if [ "$_unfrog" != "true" ]; then
   _hotfix="NosTale" _hotfix_boundary="" _hotfix_import
   _hotfix="battlenet" _hotfix_boundary="" _hotfix_import
   _hotfix="legacy_ntdll_writecopy" _hotfix_boundary="" _hotfix_import
-  _hotfix="shm_esync_fsync" _hotfix_boundary="" _hotfix_import
+  #_hotfix="shm_esync_fsync" _hotfix_boundary="" _hotfix_import
   _hotfix="autoconf-opencl-hotfix" _hotfix_boundary="" _hotfix_import
   _hotfix="winedevice-Default_Drivers" _hotfix_boundary="" _hotfix_import
 
