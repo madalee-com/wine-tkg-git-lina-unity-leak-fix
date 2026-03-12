@@ -176,7 +176,7 @@ function new_lib_path_check {
     _x86_64_windows_tail="/$_lib64name/wine"
   fi
 
-  _new_lib_paths_69="true"
+  _new_lib_paths_69="false"
 
   echo "_i386_unix_path=$_i386_unix_path" >>"$_logdir"/proton-tkg.log 2>&1
   echo "_i386_windows_path=$_i386_windows_path" >>"$_logdir"/proton-tkg.log 2>&1
