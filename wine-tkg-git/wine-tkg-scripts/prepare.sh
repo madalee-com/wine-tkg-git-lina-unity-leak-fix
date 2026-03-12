@@ -1053,7 +1053,7 @@ _prepare() {
 
 	_patchpathes=( "$_where/wine-tkg-patches/game-specific/quake_champions_fix/quake_champions_fix"
                    "$_where/wine-tkg-patches/proton-tkg-specific/proton-cpu-topology-overrides/proton-cpu-topology-overrides"
-                   "$_where/wine-tkg-patches/misc/fastsync/fastsync"
+                   #"$_where/wine-tkg-patches/misc/fastsync/fastsync"
                    "$_where/wine-tkg-patches/proton-tkg-specific/proton-sdl-joy/proton-sdl-joy" ) && _patchpathloader
 
 	if [ "$_EXTERNAL_INSTALL" = "proton" ] && [ "$_unfrog" != "true" ] || [ "$_steamvr_support" = "true" ]; then
