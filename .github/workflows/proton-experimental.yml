@@ -26,8 +26,8 @@ jobs:
           sed -i 's/wayland_driver="false"/wayland_driver="true"/' proton-tkg.cfg
           sed -i 's/_use_staging="true"/_use_staging="false"/' proton-tkg.cfg
           sed -i 's/_sdl_joy_support="false"/_sdl_joy_support="true"/' proton-tkg-profiles/advanced-customization.cfg
-          echo '_new_lib_paths_69="false"' >> proton-tkg.cfg
-          sed -i 's/_proton_use_steamhelper="true"/_proton_use_steamhelper="false"/' proton-tkg-profiles/advanced-customization.cfg
+          #echo '_new_lib_paths_69="false"' >> proton-tkg.cfg
+          #sed -i 's/_proton_use_steamhelper="true"/_proton_use_steamhelper="false"/' proton-tkg-profiles/advanced-customization.cfg
           echo '_ci_build="true"' >> proton-tkg.cfg
           echo '_LOCAL_PRESET="wine-tkg-valve-exp"' >> proton-tkg.cfg
           sed -i 's/_no_container="false"/_no_container="true"/' proton-tkg.sh
