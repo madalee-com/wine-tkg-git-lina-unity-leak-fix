@@ -17,7 +17,7 @@ jobs:
           sudo aptitude remove -y '?narrow(?installed,?version(deb.sury.org))'
           cd wine-tkg-git
           sed -i 's/LOCAL_PRESET=""/LOCAL_PRESET="chaotic-upstream"/' customization.cfg
-          sed -i 's/_plain_version=""/_plain_version="wine-11.2"/' customization.cfg
+          sed -i 's/_plain_version=""/_plain_version="wine-10.20"/' customization.cfg
           sed -i 's/_NOLIB32="false"/_NOLIB32="wow64"/' wine-tkg-profiles/advanced-customization.cfg
           rm wine-tkg-userpatches/lina-unity-leak.mypatch
           #echo '_ci_build="true"' >> customization.cfg
