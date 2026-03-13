@@ -551,10 +551,10 @@ function build_steamhelper {
       fi
     fi
 
-    if [ "$_new_lib_paths_69" != "true" ]; then
+    #if [ "$_new_lib_paths_69" != "true" ]; then
       touch "$_nowhere/Proton/build/steam.win32/steam.spec"
       winebuild --exe --fake-module -m32 -E "$_nowhere/Proton/build/steam.win32/steam.spec" --dll-name=steam -o steam.exe.fake || exit 1
-    fi
+    #fi
 
     # 64-bit
     if [ -e "$_nowhere"/Proton/steam_helper/64/libsteam_api.so ]; then
