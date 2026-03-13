@@ -176,8 +176,6 @@ function new_lib_path_check {
     _x86_64_windows_tail="/$_lib64name/wine"
   fi
 
-  _new_lib_paths_69="false"
-
   echo "_i386_unix_path=$_i386_unix_path" >>"$_logdir"/proton-tkg.log 2>&1
   echo "_i386_windows_path=$_i386_windows_path" >>"$_logdir"/proton-tkg.log 2>&1
   echo "_x86_64_unix_path=$_x86_64_unix_path" >>"$_logdir"/proton-tkg.log 2>&1
@@ -311,10 +309,10 @@ function build_lsteamclient {
   winemaker $WINEMAKERFLAGS --dll -DSTEAM_API_EXPORTS -Dprivate=public -Dprotected=public .
   sed -re 's@_LDFLAGS=@_LDFLAGS= -static-libgcc -static-libstdc++ -ldl @' -i "$_nowhere/Proton/build/lsteamclient.win64/Makefile"
   make -e CC="winegcc -m64" CXX="wineg++ -m64 $_cxx_addon" -C "$_nowhere/Proton/build/lsteamclient.win64" -j$(nproc) && strip --strip-debug lsteamclient.dll.so || exit 1
-  if [ "$_new_lib_paths_69" != "true" ]; then
+  #if [ "$_new_lib_paths_69" != "true" ]; then
     touch "$_nowhere/Proton/build/lsteamclient.win64/steamclient.spec"
     winebuild --dll --fake-module -m64 -E "$_nowhere/Proton/build/lsteamclient.win64/steamclient.spec" --dll-name=lsteamclient -o lsteamclient.dll.fake || exit 1
-  fi
+  #fi
   cd ../..
 
   cd build/lsteamclient.win32
@@ -323,10 +321,10 @@ function build_lsteamclient {
     sed -re 's@_LDFLAGS=@_LDFLAGS= -static-libgcc -static-libstdc++ -ldl @' -i "$_nowhere/Proton/build/lsteamclient.win32/Makefile"
     make -e CC="winegcc -m32" CXX="wineg++ -m32 $_cxx_addon" -C "$_nowhere/Proton/build/lsteamclient.win32" -j$(nproc) && strip --strip-debug lsteamclient.dll.so || exit 1
   fi
-  if [ "$_new_lib_paths_69" != "true" ]; then
+  #if [ "$_new_lib_paths_69" != "true" ]; then
     touch "$_nowhere/Proton/build/lsteamclient.win32/steamclient.spec"
     winebuild --dll --fake-module -m32 -E "$_nowhere/Proton/build/lsteamclient.win32/steamclient.spec" --dll-name=lsteamclient -o lsteamclient.dll.fake || exit 1
-  fi
+  #fi
   cd "$_nowhere"
 
   # Inject lsteamclient libs in our wine-tkg-git build
