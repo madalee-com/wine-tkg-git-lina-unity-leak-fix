@@ -549,7 +549,7 @@ class Proton:
         return self.base_dir + d
 
     def arch_pe_dir(self, d, wow64):
-        return self.lib64_dir + d + "/" + (self.wow64_pe_arch if wow64 else self.host_pe_arch) + "/"
+        return (self.lib_dir if wow64 else self.lib64_dir) + d + "/" + (self.wow64_pe_arch if wow64 else self.host_pe_arch) + "/"
 
     def cleanup_legacy_dist(self):
         old_dist_dir = self.path("dist/")
@@ -1084,21 +1084,8 @@ class CompatData:
                         os.makedirs(os.path.dirname(dstvdf), exist_ok=True)
                         shutil.copyfile(srcvdf, dstvdf)
 
-                #copy openvr files into place
-                makedirs(self.prefix_dir + "/drive_c/vrclient/bin")
-                try_copy(g_proton.arch_pe_dir("wine", True) + "vrclient.dll", "drive_c/vrclient/bin",
-                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
-                try_copy(g_proton.arch_pe_dir("wine", False) + "vrclient_x64.dll", "drive_c/vrclient/bin",
-                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
-
-                try_copy(g_proton.lib_dir + "wine/dxvk/" + "openvr_api_dxvk.dll", "drive_c/windows/syswow64",
-                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
-                try_copy(g_proton.lib64_dir + "wine/dxvk/" + "openvr_api_dxvk.dll", "drive_c/windows/system32",
-                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
-
-                makedirs(self.prefix_dir + "/drive_c/openxr")
-                try_copy(g_proton.default_pfx_dir + "drive_c/openxr/wineopenxr64.json", "drive_c/openxr",
-                        prefix=self.prefix_dir, track_file=tracked_files, link_debug=True)
+                # Disable openvr lib as we don't support it
+                g_session.dlloverrides["openvr_api_dxvk"] = "d"
 
                 if use_wined3d:
                     dxvkfiles = []
@@ -1279,7 +1266,6 @@ def default_compat_config():
                 "2710",     #Act of War: Direct Action
                 "1621680",  #Sword and Fairy 4
                 "888040",   #Metal Fatigue
-                "2079120",  #Warudo
                 ]:
             ret.add("noforcelgadd")
 
