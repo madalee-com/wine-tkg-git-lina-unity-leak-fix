@@ -36,7 +36,7 @@ jobs:
           yes|./proton-tkg.sh
           cd built
           cd proton_tkg_e*
-          patch < ../../../custom-proton/proton-tkg-warudo.diff
+          patch < ../../../custom-proton/proton-warudo-tkg.diff
           cd ..
           tar -cvzf ../Proton-Experimental-Lina-Unity-Leak-Patch-TKG-Proton-v3.tar.gz ./
           cd ..
