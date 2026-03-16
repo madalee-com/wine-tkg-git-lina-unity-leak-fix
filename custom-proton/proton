@@ -2056,9 +2056,9 @@ class Session:
                     "1985810",  # CoD: Black Ops Cold War
                     "1549250",  # Undecember
                 ]:
-            argv = [g_proton.wine_bin]
+            argv = [g_proton.wine_bin, "c:\\Program Files (x86)\\Steam\\steam.exe"]
         else:
-            argv = [g_proton.wine64_bin]
+            argv = [g_proton.wine64_bin, "c:\\windows\\system32\\steam.exe"]
 
         rc = self.run_proc(adverb + argv + sys.argv[2:] + self.cmdlineappend)
 
