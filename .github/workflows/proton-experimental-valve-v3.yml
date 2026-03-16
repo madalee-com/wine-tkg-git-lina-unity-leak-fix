@@ -37,6 +37,7 @@ jobs:
           cd built
           cd proton_tkg_e*
           cp ../../../custom-proton/proton ./
+          cp ../../../custom-proton/toolmanifest.vdf ./
           cd ..
           tar -cvzf ../Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3.tar.gz ./
           cd ..
