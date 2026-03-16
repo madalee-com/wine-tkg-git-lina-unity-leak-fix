@@ -26,7 +26,7 @@ jobs:
           sed -i 's/wayland_driver="false"/wayland_driver="true"/' proton-tkg.cfg
           sed -i 's/_use_staging="true"/_use_staging="false"/' proton-tkg.cfg
           sed -i 's/amdags-proton.mypatch //' proton-tkg.cfg
-          sed -i 's/_nosteamruntime="false"/_nosteamruntime="true"/' proton-tkg-profiles/advanced-customization.cfg
+          sed -i 's/_nosteamruntime="false"/_nosteamruntime="sniper"/' proton-tkg-profiles/advanced-customization.cfg
           sed -i 's/_sdl_joy_support="false"/_sdl_joy_support="true"/' proton-tkg-profiles/advanced-customization.cfg
           #sed -i 's/_proton_use_steamhelper="true"/_proton_use_steamhelper="false"/' proton-tkg-profiles/advanced-customization.cfg
           sed -i 's/_NOLIB32="false"/_NOLIB32="true"/' proton-tkg-profiles/advanced-customization.cfg
