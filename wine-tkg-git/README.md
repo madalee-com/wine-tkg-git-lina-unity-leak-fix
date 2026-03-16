@@ -1,37 +1,50 @@
-# Proton 10 Experimental Bleeding Edge with Hoshino Lina's Patch
-## Custom patched Proton for the Unity extreme memory leak that occurs with some version of mono's garbage collector
+# Wine to rule them all !
 
-This is a fork of [Wine-TKG-Git](https://github.com/Frogging-Family/wine-tkg-git) that includes a patch by Hoshino Lina that fix's/worksaround a bug in Wine that can lead to an extreme memory leak in some version's of mono's garbage collector which is used in some versions of Unity.
+## PLEASE DO NOT REPORT BUGS ENCOUNTERED WITH THIS AT WINEHQ OR VALVESOFTWARE, REPORT HERE INSTEAD !
 
-Specifically, this is intended to fix things for Warudo and other software that uses those specific versions of Unity/Mono GC.
+Wine-tkg is a build-system aiming at easier custom wine builds creation.
 
-This also includes some specific workarounds for Warudo to make launching it as simple as possible.
 
-## Notes
+# Quick how-to :
 
-The ideal solution would be a fix applied directly to Wine and adopted in to Valve Wine, and for software using that Unity/Mono GC library to upgrade to a newer version of the GC library that handles these exceptions without the leak.
+(for dependencies, see the [wiki page](https://github.com/Tk-Glitch/PKGBUILDS/wiki/wine-tkg-git) )
 
-Unfortunately it can takes months or more to get a fix like this in to the Wine source and then in to Valve's Wine source, and then in to a version of Proton that is easily accessible for users.
+**Independently of the distro used, you'll want MinGW compiler to build recent wine as it fails to build more often than not without it these days.**
 
-This works as a stop-gap solution until all of that happens.
 
-## Usage
+## Download the source :
 
-1. **Download the correct release for your situation:**
-- [Valve Proton v3 - no Runtime](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if Warudo is your main usage goal or you need to use Spout2pw and the others aren't working for you.
-- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you need to use Spout2pw and want a release closer to Valve's Steam Proton that might be more compatible with other games.
-- [TKG Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you want the most similar to the Wine-TKG-Git implementation and you do not need to use Spout2pw.
+ * Clone the repo (allows you to use `git pull` to get updates) :
+```
+git clone https://github.com/Frogging-Family/wine-tkg-git.git
+```
 
-2. **Extract the zip to the compatability tools path:**
-- For directly installed Wine: `~/.local/share/Steam/compatibilitytools.d/`
-- For Flatpack Wine: `~/.var/app/com.valvesoftware.Steam/.local/share/Steam/compatibilitytools.d/`
+## Configuration/customization :
 
-3. **Restart Steam if it's already running**
+If you want to customize the patches and features of your builds, you can find basic settings in [customization.cfg](https://github.com/Frogging-Family/wine-tkg-git/blob/master/wine-tkg-git/customization.cfg) and advanced settings in [wine-tkg-profiles/advanced-customization.cfg](https://github.com/Frogging-Family/wine-tkg-git/blob/master/wine-tkg-git/wine-tkg-profiles/advanced-customization.cfg).
 
-## Acknowledgements
+You can also create an external configuration file that will contain all settings in a centralized way and survive repo updates. A sample file for this can be found [here](https://github.com/Frogging-Family/wine-tkg-git/blob/master/wine-tkg-git/wine-tkg-profiles/sample-external-config.cfg). The default path for this file is `~/.config/frogminer/wine-tkg.cfg` and can be changed in `wine-tkg-profiles/advanced-customization.cfg` with the `_EXT_CONFIG_PATH` option.
 
-- 99.9% of this project is: https://github.com/Frogging-Family/wine-tkg-git
-- [Hoshino Lina](https://github.com/hoshinolina) for making the patch
-- [AdalynBlack](https://github.com/AdalynBlack) for helping to isolate the actual bug
-- [Madalee](https://github.com/madalee-com) for putting this fork together
+
+## Building :
+
+ * We need to get into the wine-tkg-git dir first:
+```
+cd wine-tkg-git
+```
+
+### For Arch (and other pacman/makepkg distros) :
+
+ * From the `wine-tkg-git` directory (where the PKGBUILD is located), run the following command in a terminal to start the building process :
+```
+makepkg -si
+```
+
+### For other distros (make sure to check the [wiki page](https://github.com/Tk-Glitch/PKGBUILDS/wiki/wine-tkg-git)) :
+
+ * From the `wine-tkg-git` directory (where the PKGBUILD is located), run the following command in a terminal to start the building process :
+```
+./non-makepkg-build.sh
+```
+**Your build will be found in the `PKGBUILD/wine-tkg-git/non-makepkg-builds` dir (independently of the chosen configuration)**
 
