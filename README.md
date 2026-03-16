@@ -1,64 +1,37 @@
-# Wine to rule them all !
+# Proton 10 Experimental Bleeding Edge with Hoshino Lina's Patch
+## Custom patched Proton for the Unity extreme memory leak that occurs with some version of mono's garbage collector
 
-You must be logged in to GitHub in order to download Wine or Proton nightly builds.
+This is a fork of [Wine-TKG-Git](https://github.com/Frogging-Family/wine-tkg-git) that includes a patch by Hoshino Lina that fix's/worksaround a bug in Wine that can lead to an extreme memory leak in some version's of mono's garbage collector which is used in some versions of Unity.
 
-## Wine nightly builds
+Specifically, this is intended to fix things for Warudo and other software that uses those specific versions of Unity/Mono GC.
 
-- wine-staging patchset applied
-- ntsync support added as needed
+This also includes some specific workarounds for Warudo to make launching it as simple as possible.
 
-Wine | [Arch Linux](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/wine-arch.yml) | [Fedora](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/wine-fedora.yml) | [Ubuntu](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/wine-ubuntu.yml) |
--------------|--------|--------|-------|
+## Notes
 
-Valve Wine | [Exp Bleeding Edge Arch Linux](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/wine-valvexbe-pacman.yml) | [Exp Bleeding Edge Other distro](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/wine-valvexbe.yml) |
--------------|--------|--------|
+The ideal solution would be a fix applied directly to Wine and adopted in to Valve Wine, and for software using that Unity/Mono GC library to upgrade to a newer version of the GC library that handles these exceptions without the leak.
 
-*The Exp Bleeding Edge Other distro versions are built on Ubuntu latest, which should work fine on most distros not using years old packages*
+Unfortunately it can takes months or more to get a fix like this in to the Wine source and then in to Valve's Wine source, and then in to a version of Proton that is easily accessible for users.
 
-## Proton nightly builds
+This works as a stop-gap solution until all of that happens.
 
-- wine-staging patchset applied
-- wine master version is built against Arch current, making glibc 2.42+ a requirement
-- valve exp be version is built against the sniper container
-- ntsync support added as needed
+## Usage
 
-Proton | [Valve Exp Bleeding Edge](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/proton-valvexbe-sniper.yml) | [Wine Master (hit or miss edition)](https://github.com/Frogging-Family/wine-tkg-git/actions/workflows/proton-arch-nopackage.yml) |
--------------|--------|--------|
+1. **Download the correct release for your situation:**
+- [Valve Proton v3 - no Runtime](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if Warudo is your main usage goal or you need to use Spout2pw and the others aren't working for you.
+- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you need to use Spout2pw and want a release closer to Valve's Steam Proton that might be more compatible with other games.
+- [TKG Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you want the most similar to the Wine-TKG-Git implementation and you do not need to use Spout2pw.
 
-(drop the extracted folder in `/$HOME/.steam/root/compatibilitytools.d/` or, for Ubuntu/Debian based, the `/$HOME/.steam/compatibilitytools.d/` dir)
+2. **Extract the zip to the compatability tools path:**
+- For directly installed Wine: `~/.local/share/Steam/compatibilitytools.d/`
+- For Flatpack Wine: `~/.var/app/com.valvesoftware.Steam/.local/share/Steam/compatibilitytools.d/`
 
-## PLEASE DO NOT REPORT BUGS ENCOUNTERED WITH THIS AT WINEHQ OR VALVESOFTWARE, REPORT HERE INSTEAD !
+3. **Restart Steam if it's already running**
 
-Wine-tkg is a build-system aiming at easier custom wine builds creation. You can now easily get the "plain wine + pba + steam fix" build you've been dreaming about!
+## Acknowledgements
 
-It can also make custom Proton builds with its wrapping script: https://github.com/Frogging-Family/wine-tkg-git/tree/master/proton-tkg
+- 99.9% of this project is: https://github.com/Frogging-Family/wine-tkg-git
+- [Hoshino Lina](https://github.com/hoshinolina) for making the patch
+- [AdalynBlack](https://github.com/AdalynBlack) for helping to isolate the actual bug
+- [Madalee](https://github.com/madalee-com) for putting this fork together
 
-**By default, it'll pull current wine/wine-staging git versions. You can target a specific release or commit in the .cfg if needed.**
-
-A comfortable selection of patches is available to you, with some of them being enabled by default for your convenience (see [this sample config file](https://github.com/Frogging-Family/wine-tkg-git/blob/master/wine-tkg-git/wine-tkg-profiles/sample-external-config.cfg) for the full list and details)
-
-An ever evolving selection of staging, experimental and/or hacky patches are also available [in the community-patches](https://github.com/Frogging-Family/community-patches/tree/master/wine-tkg-git)
-
-**Can be built with your own patches - See [README in wine-tkg-git/wine-tkg-userpatches](https://github.com/Frogging-Family/wine-tkg-git/blob/master/wine-tkg-git/wine-tkg-userpatches/README.md) for instructions**
-
-### Generated Wine-tkg sources (staging-based):
- - Wine-tkg : https://github.com/Tk-Glitch/wine-tkg
- - Proton-tkg : https://github.com/Tk-Glitch/wine-proton-tkg
-
-Wine : https://github.com/wine-mirror/wine
-
-Wine-staging : https://github.com/wine-staging/wine-staging
-
-Wine esync : https://github.com/zfigura/wine/tree/esync
-
-Wine fsync : https://github.com/zfigura/wine/tree/fsync
-
-Proton : https://github.com/ValveSoftware/Proton
-
-Wine-pba (Only working correctly up to 3.18 - Force disabled on newer wine bases due to regressions) : https://github.com/acomminos/wine-pba
-
-Thanks to @Firerat and @bobwya for their rebase work :
-- https://gitlab.com/Firer4t/wine-pba
-- https://github.com/bobwya/gentoo-wine-pba
-
-For Gallium 9 support, use https://github.com/iXit/wine-nine-standalone (available from winetricks and AUR) - Legacy nine support can still be turned on if you're building a 4.1 base or older.
