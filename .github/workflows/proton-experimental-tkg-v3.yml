@@ -36,7 +36,7 @@ jobs:
           yes|./proton-tkg.sh
           cd built
           cd proton_tkg_e*
-          sed -i 's/# disable dxvknvapi for titles which dislike it/# disable dxvknvapi for titles which dislike it\n                "2079120", #Warudo/' proton
+          patch < ../../../custom-proton/proton-tkg-warudo.diff
           cd ..
           tar -cvzf ../Proton-Experimental-Lina-Unity-Leak-Patch-TKG-Proton-v3.tar.gz ./
           cd ..
