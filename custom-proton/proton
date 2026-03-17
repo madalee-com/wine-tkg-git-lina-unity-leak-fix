@@ -1552,19 +1552,10 @@ class Session:
             # Allow wine to restore this when calling an external app.
             self.env['ORIG_'+ld_path_var] = os.environ.get(ld_path_var, '')
 
-        prepend_to_env_str(self.env, ld_path_var, g_proton.lib64_dir + ":" + g_proton.lib_dir + ":" + g_proton.lib64_dir + "x86_64-unix/:" + g_proton.lib_dir + "i386-unix/", ":")
-
-        dllpaths = [g_proton.lib64_dir + ":" + g_proton.lib_dir, g_proton.lib64_dir + "vkd3d", g_proton.lib_dir + "vkd3d", g_proton.lib64_dir + "wine", g_proton.lib_dir + "wine"]
-        if "WINEDLLPATH" in os.environ:
-            dllpaths.append(os.environ["WINEDLLPATH"])
-        self.env["WINEDLLPATH"] = ':'.join(dllpaths)
-
-
-
-        ld_library_path = [g_proton.lib_dir, g_proton.lib64_dir]
+        ld_library_path = [g_proton.lib64_dir, g_proton.lib_dir, g_proton.lib64_dir + "x86_64-windows", g_proton.lib_dir + "i386-windows"]
         prepend_to_env_str(self.env, ld_path_var, ':'.join(ld_library_path), ":")
 
-        dllpaths = [g_proton.lib_dir + "wine" + "/i386-unix/", g_proton.lib64_dir + "wine" + "/x86_64-unix/"]
+        dllpaths = [g_proton.lib64_dir + "vkd3d", g_proton.lib_dir + "vkd3d", g_proton.lib64_dir + "wine", g_proton.lib_dir + "wine"]
         if "WINEDLLPATH" in os.environ:
             dllpaths.append(os.environ["WINEDLLPATH"])
         self.env["WINEDLLPATH"] = ':'.join(dllpaths)
