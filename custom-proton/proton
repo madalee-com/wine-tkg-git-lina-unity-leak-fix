@@ -82,12 +82,17 @@ def file_is_wine_builtin_dll(path):
     if os.path.islink(path):
         contents = os.readlink(path)
         if os.path.dirname(contents).endswith((
-                    '/lib/wine',
-                    '/lib64/wine',
-                    '/lib/wine/fakedlls',
-                    '/lib64/wine/fakedlls',
                     '/lib/wine/i386-unix',
                     '/lib/wine/i386-windows',
+                    '/lib/wine/x86_64-unix',
+                    '/lib/wine/x86_64-windows',
+                    '/lib/wine/aarch64-unix',
+                    '/lib/wine/aarch64-windows',
+                    # old paths
+                    '/lib/wine',
+                    '/lib/wine/fakedlls',
+                    '/lib64/wine',
+                    '/lib64/wine/fakedlls',
                     '/lib64/wine/x86_64-unix',
                     '/lib64/wine/x86_64-windows'
                 )):
@@ -1550,6 +1555,16 @@ class Session:
         prepend_to_env_str(self.env, ld_path_var, g_proton.lib64_dir + ":" + g_proton.lib_dir + ":" + g_proton.lib64_dir + "x86_64-unix/:" + g_proton.lib_dir + "i386-unix/", ":")
 
         dllpaths = [g_proton.lib64_dir + ":" + g_proton.lib_dir, g_proton.lib64_dir + "vkd3d", g_proton.lib_dir + "vkd3d", g_proton.lib64_dir + "wine", g_proton.lib_dir + "wine"]
+        if "WINEDLLPATH" in os.environ:
+            dllpaths.append(os.environ["WINEDLLPATH"])
+        self.env["WINEDLLPATH"] = ':'.join(dllpaths)
+
+
+
+        ld_library_path = [g_proton.lib_dir, g_proton.lib64_dir]
+        prepend_to_env_str(self.env, ld_path_var, ':'.join(ld_library_path), ":")
+
+        dllpaths = [g_proton.lib_dir + "wine" + "/i386-unix/", g_proton.lib64_dir + "wine" + "/x86_64-unix/"]
         if "WINEDLLPATH" in os.environ:
             dllpaths.append(os.environ["WINEDLLPATH"])
         self.env["WINEDLLPATH"] = ':'.join(dllpaths)
