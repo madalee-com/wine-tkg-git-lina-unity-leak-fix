@@ -18,7 +18,7 @@ This works as a stop-gap solution until all of that happens.
 ## Usage
 
 1. **Download the correct release for your situation:**
-- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-rev5) if you need to use Spout2pw and want a release closer to Valve's Steam Proton that might be more compatible with other games.
+- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-rev5) if you need to use Spout2pw or want a release closer to Valve's Steam Proton that might be more compatible with other games.
 - [TKG Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you want the most similar to the Wine-TKG-Git implementation and you do not need to use Spout2pw.
 
 2. **Extract the zip to the compatability tools path:**
@@ -26,6 +26,13 @@ This works as a stop-gap solution until all of that happens.
 - For Flatpack Wine: `~/.var/app/com.valvesoftware.Steam/.local/share/Steam/compatibilitytools.d/`
 
 3. **Restart Steam if it's already running**
+
+### If you are trying to use Spout2PW
+You may get an error when starting Warudo with spout2pw saying **"Installation unsuccessful"**.
+If this happens:
+- Switch to Proton Experimental
+- Try to start Warudo(it's okay if it crashes, just so long as Spout gets setup and says **"Installation successful"**).
+- Then switch back to this patched Proton and everything should work.
 
 ## Acknowledgements
 
