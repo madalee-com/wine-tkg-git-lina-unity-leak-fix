@@ -1,8 +1,8 @@
 "manifest"
 {
   "version" "2"
-  "commandline" "/proton %verb%"
-  "require_tool_appid" "1628350"
-  "use_sessions" "1"
-  "compatmanager_layer_name" "proton"
+  "commandline" "/proton run"
+  "commandline_getnativepath" "/proton getnativepath"
+  "commandline_getcompatpath" "/proton getcompatpath"
+  "commandline_waitforexitandrun" "/proton waitforexitandrun"
 }
