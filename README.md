@@ -18,8 +18,7 @@ This works as a stop-gap solution until all of that happens.
 ## Usage
 
 1. **Download the correct release for your situation:**
-- [Valve Proton v3 - no Runtime](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if Warudo is your main usage goal or you need to use Spout2pw and the others aren't working for you.
-- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you need to use Spout2pw and want a release closer to Valve's Steam Proton that might be more compatible with other games.
+- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-rev5) if you need to use Spout2pw and want a release closer to Valve's Steam Proton that might be more compatible with other games.
 - [TKG Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you want the most similar to the Wine-TKG-Git implementation and you do not need to use Spout2pw.
 
 2. **Extract the zip to the compatability tools path:**
