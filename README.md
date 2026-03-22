@@ -22,9 +22,14 @@ This works as a stop-gap solution until all of that happens.
 - [TKG Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you want the most similar to the Wine-TKG-Git implementation and you do not need to use Spout2pw.
 
 2. **Extract the zip to the compatability tools path:**
-- For directly installed Wine: `~/.local/share/Steam/compatibilitytools.d/`
+- For directly installed Wine: `~/.local/share/Steam/compatibilitytools.d/` or `~/.steam/<something>/Steam/compatibilitytools.d/`
 - For Flatpack Wine: `~/.var/app/com.valvesoftware.Steam/.local/share/Steam/compatibilitytools.d/`
-
+- For other installation methods, you can find your compatabilitytools.d path by:
+    1. In Steam, click "Help->Steam Runtime Diagnostics"
+    2. In the window that opens look for "path" under steam installation
+    3. The correct path should be `<path>/compatibilitytools.d`
+    
+        ![steam runtime diagnostics menu](readme-assets/steam-runtime-diagnostics-menu.png) ![steam runtime diagnostics](readme-assets/steam-runtime-diagnostics.png)
 3. **Restart Steam if it's already running**
 
 ### If you are trying to use Spout2PW
