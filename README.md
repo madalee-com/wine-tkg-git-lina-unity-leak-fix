@@ -1,7 +1,7 @@
 # Proton 10 Experimental Bleeding Edge with Hoshino Lina's Patch
 ## Custom patched Proton for the Unity extreme memory leak that occurs with some version of mono's garbage collector
 
-This is a fork of [Wine-TKG-Git](https://github.com/Frogging-Family/wine-tkg-git) that includes a patch by Hoshino Lina that fix's/worksaround a bug in Wine that can lead to an extreme memory leak in some version's of mono's garbage collector which is used in some versions of Unity.
+This is a fork of [Wine-TKG-Git](https://github.com/Frogging-Family/wine-tkg-git) that includes a patch by Hoshino Lina that fix's a bug in Wine that can lead to extreme memory leak in some version's of mono's garbage collector which is used in some versions of Unity.
 
 Specifically, this is intended to fix things for Warudo and other software that uses those specific versions of Unity/Mono GC.
 
@@ -28,7 +28,7 @@ This works as a stop-gap solution until all of that happens.
     1. In Steam, click "Help->Steam Runtime Diagnostics"
     2. In the window that opens look for "path" under steam installation
     3. The correct path should be `<path>/compatibilitytools.d`
-    
+
         ![steam runtime diagnostics menu](readme-assets/steam-runtime-diagnostics-menu.png) ![steam runtime diagnostics](readme-assets/steam-runtime-diagnostics.png)
 3. **Restart Steam if it's already running**
 
