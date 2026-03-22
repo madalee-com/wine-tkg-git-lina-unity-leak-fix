@@ -1,6 +1,8 @@
---- a/dlls/ntdll/unix/signal_x86_64.c	2026-03-22 12:49:50.597180135 -0400
-+++ a/dlls/ntdll/unix/signal_x86_64.c	2026-03-22 12:48:39.280127402 -0400
-@@ -459,6 +459,7 @@
+diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
+index 0466b1d2056..8932bf8fa92 100644
+--- a/dlls/ntdll/unix/signal_x86_64.c
++++ b/dlls/ntdll/unix/signal_x86_64.c
+@@ -459,6 +459,7 @@ struct amd64_thread_data
      DWORD                 xstate_features_size;  /* 033c */
      UINT64                xstate_features_mask;  /* 0340 */
      void                **instrumentation_callback; /* 0348 */
@@ -8,7 +10,7 @@
  };
  
  C_ASSERT( sizeof(struct amd64_thread_data) <= sizeof(((struct ntdll_thread_data *)0)->cpu_data) );
-@@ -1095,10 +1096,14 @@
+@@ -1095,6 +1096,9 @@ NTSTATUS WINAPI NtSetContextThread( HANDLE handle, const CONTEXT *context )
          frame->rsp    = context->Rsp;
          frame->rip    = context->Rip;
          frame->eflags = context->EFlags;
@@ -18,12 +20,7 @@
      }
      if (flags & CONTEXT_FLOATING_POINT)
      {
-         frame->xsave = context->FltSave;
-+        frame->xsave.MxCsr = context->MxCsr;
-         frame->xstate.Mask |= XSTATE_MASK_LEGACY;
-     }
-     if (flags & CONTEXT_XSTATE)
-@@ -1593,6 +1598,8 @@
+@@ -1594,6 +1598,8 @@ NTSTATUS call_user_apc_dispatcher( CONTEXT *context, ULONG_PTR arg1, ULONG_PTR a
      frame->rsp = (ULONG64)stack;
      frame->rip = (ULONG64)pKiUserApcDispatcher;
      frame->restore_flags |= CONTEXT_CONTROL;
@@ -32,7 +29,7 @@
      return status;
  }
  
-@@ -1639,6 +1646,8 @@
+@@ -1640,6 +1646,8 @@ NTSTATUS call_user_exception_dispatcher( EXCEPTION_RECORD *rec, CONTEXT *context
      frame->rsp = (ULONG64)stack;
      frame->rip = (ULONG64)pKiUserExceptionDispatcher;
      frame->restore_flags |= CONTEXT_CONTROL;
@@ -41,42 +38,7 @@
      return status;
  }
  
-@@ -1917,14 +1926,24 @@
- }
- syscall_nr_translation[] =
- {
-+    {0x10, ~0u, NtQueryObject},
-     {0x19, ~0u, NtQueryInformationProcess},
-+    {0x1c, ~0u, NtSetInformationProcess},
-+    {0x25, ~0u, NtQueryInformationThread},
-+    {0x0d, ~0u, NtSetInformationThread},
-     {0x36, ~0u, NtQuerySystemInformation},
-     {0xf3, ~0u, NtGetContextThread},
-+    {0x33, ~0u, NtOpenFile},
-     {0x55, ~0u, NtCreateFile},
-+    {0x4a, ~0u, NtCreateSection},
-+    {0x28, ~0u, NtMapViewOfSection},
-+    {0x2a, ~0u, NtUnmapViewOfSection},
-     {0x08, ~0u, NtWriteFile},
-     {0x06, ~0u, NtReadFile},
-     {0x0f, ~0u, NtClose},
-     {0x23, ~0u, NtQueryVirtualMemory},
-+    {0x50, ~0u, NtProtectVirtualMemory},
-+    {0xa6, ~0u, NtCreateDebugObject},
- };
- 
- static void sigsys_handler_rdr2( int signal, siginfo_t *siginfo, void *sigcontext )
-@@ -2043,7 +2062,8 @@
- 
-     {
-         const char *sgi = getenv("SteamGameId");
--        if (sgi && (!strcmp(sgi, "1174180") || !strcmp(sgi, "1404210") || !strcmp(sgi, "1418100")))
-+        if (sgi && (!strcmp(sgi, "1174180") || !strcmp(sgi, "1404210") || !strcmp(sgi, "1418100") || !strcmp(sgi, "2767030")
-+                    || !strcmp(sgi, "2853730") || !strcmp( sgi, "298110" )))
-         {
-             /* Use specific signal handler. */
-             sig_act->sa_sigaction = sigsys_handler_rdr2;
-@@ -2328,7 +2348,10 @@
+@@ -2340,7 +2348,10 @@ static BOOL handle_syscall_trap( ucontext_t *sigcontext, siginfo_t *siginfo )
      frame->rip = *(ULONG64 *)RSP_sig( sigcontext );
      frame->eflags = EFL_sig(sigcontext);
      frame->restore_flags = CONTEXT_CONTROL;
@@ -88,7 +50,7 @@
  
      RCX_sig( sigcontext ) = (ULONG64)frame;
      RSP_sig( sigcontext ) += sizeof(ULONG64);
-@@ -2563,6 +2586,59 @@
+@@ -2575,6 +2586,59 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
      abort_thread( 0 );
  }
  
@@ -148,7 +110,7 @@
  
  /**********************************************************************
   *		usr1_handler
-@@ -2572,53 +2648,35 @@
+@@ -2584,53 +2648,35 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
  static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
  {
      ucontext_t *ucontext = init_handler( sigcontext );
@@ -211,7 +173,7 @@
 -    else
 +    else if (RIP_sig(ucontext) >= (ULONG_PTR)__wine_syscall_dispatcher_return_ptr &&
 +             RIP_sig(ucontext) < (ULONG_PTR)__wine_syscall_dispatcher_return_end_ptr)
-     {
++    {
 +        /* Interrupted during syscall exit. Rewind the exit and handle as inside syscall. */
 +        TRACE( "rewinding syscall exit due to SIGUSR1 (rip=0x%lx)\n", (long)RIP_sig(ucontext));
 +        R13_sig(ucontext) = (ULONG_PTR)NtCurrentTeb();
@@ -222,12 +184,12 @@
 +        /* Fallthrough */
 +    }
 +    else if (!is_inside_syscall( ucontext ))
-+    {
+     {
 +        /* Interrupted outside a syscall. */
          struct xcontext context;
  
          save_context( &context, ucontext );
-@@ -2626,9 +2684,25 @@
+@@ -2638,9 +2684,25 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
          if (is_wow64() && context.c.SegCs == cs64_sel) context.c.ContextFlags |= CONTEXT_EXCEPTION_ACTIVE;
          wait_suspend( &context.c );
          restore_context( &context, ucontext );
@@ -254,7 +216,7 @@
  
  #ifdef __APPLE__
  /**********************************************************************
-@@ -2649,7 +2723,10 @@
+@@ -2661,7 +2723,10 @@ static void sigsys_handler( int signal, siginfo_t *siginfo, void *sigcontext )
      frame->rcx = RIP_sig(ucontext);
      frame->eflags = EFL_sig(ucontext);
      frame->restore_flags = 0;
@@ -266,7 +228,7 @@
      RCX_sig(ucontext) = (ULONG_PTR)frame;
      R11_sig(ucontext) = frame->eflags;
      EFL_sig(ucontext) &= ~0x100;  /* clear single-step flag */
-@@ -3117,6 +3194,33 @@
+@@ -3129,6 +3194,33 @@ __ASM_GLOBAL_FUNC( signal_start_thread,
  /***********************************************************************
   *           __wine_syscall_dispatcher
   */
@@ -300,7 +262,7 @@
  __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
  #ifdef __APPLE__
                     "movq %gs:0x30,%rcx\n\t"
-@@ -3228,7 +3332,16 @@
+@@ -3240,7 +3332,16 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "leaq -0x98(%rbp),%rcx\n"
                     "2:\n\t"
  #endif
@@ -318,7 +280,7 @@
                     "movq 0x18(%rcx),%r11\n\t"      /* 2nd argument */
                     "movl %eax,%ebx\n\t"
                     "shrl $8,%ebx\n\t"
-@@ -3263,6 +3376,12 @@
+@@ -3275,6 +3376,12 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "movq (%rbx),%r10\n\t"          /* table->ServiceTable */
                     "callq *(%r10,%rax,8)\n\t"
                     "leaq -0x98(%rbp),%rcx\n\t"
@@ -331,7 +293,7 @@
                     __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") ":\n\t"
                     "movl 0xb4(%rcx),%edx\n\t"      /* frame->restore_flags */
                     "testl $0x48,%edx\n\t"          /* CONTEXT_FLOATING_POINT | CONTEXT_XSTATE */
-@@ -3374,12 +3493,14 @@
+@@ -3386,12 +3493,14 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "jz 3b\n\t"
                     "testl $0x2,%edx\n\t"          /* CONTEXT_INTEGER */
                     "jnz 1b\n\t"
@@ -348,7 +310,7 @@
  
                     /* pop rbp-based kernel stack cfi */
                     __ASM_CFI("\t.cfi_restore_state\n")
-@@ -3393,25 +3514,6 @@
+@@ -3405,25 +3514,6 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher_return,
                     "movq %rsi,%rax\n\t"
                     "jmp " __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") )
  
@@ -374,7 +336,7 @@
  /***********************************************************************
   *           __wine_unix_call_dispatcher
   */
-@@ -3521,6 +3623,15 @@
+@@ -3533,6 +3623,15 @@ asm( ".data\n\t"
       ".globl " __ASM_NAME("__wine_unix_call_dispatcher_prolog_end_ptr") "\n"
       __ASM_NAME("__wine_unix_call_dispatcher_prolog_end_ptr") ":\n\t"
       ".quad " __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_prolog_end") "\n\t"
