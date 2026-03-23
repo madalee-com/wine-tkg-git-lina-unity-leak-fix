@@ -42,12 +42,12 @@ jobs:
           cd ..
           sha512sum Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3.tar.gz > Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3.sha512sum
       - name: Archive tar gz
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3
           path: proton-tkg/Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3.tar.gz
       - name: Archive tar sha512sum
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3-sha512sum
           path: proton-tkg/Proton-Experimental-Lina-Unity-Leak-Patch-Valve-Proton-v3.sha512sum
