@@ -1,13 +1,5 @@
 --- proton	2026-03-09 23:42:26.623220345 -0400
 +++ proton	2026-03-09 23:42:46.948909615 -0400
-@@ -1274,6 +1274,7 @@
-                 "2710",     #Act of War: Direct Action
-                 "1621680",  #Sword and Fairy 4
-                 "888040",   #Metal Fatigue
-+                "2079120",  #Warudo
-                 ]:
-             ret.add("noforcelgadd")
- 
 @@ -1381,6 +1382,7 @@
                  "435150", #Divinity: Original Sin 2 - Definitive Edition
                  "2176900", #Fablecraft
