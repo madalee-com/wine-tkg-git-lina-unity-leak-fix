@@ -25,8 +25,8 @@ jobs:
           sed -i 's/lib32_gstreamer="false"/lib32_gstreamer="true"/' proton-tkg.cfg
           sed -i 's/wayland_driver="false"/wayland_driver="true"/' proton-tkg.cfg
           sed -i 's/_use_staging="true"/_use_staging="false"/' proton-tkg.cfg
+          sed -i 's/_LOCAL_PRESET=""/_LOCAL_PRESET="valve-exp"/' proton-tkg.cfg
           sed -i 's/amdags-proton.mypatch //' proton-tkg.cfg
-          echo '_LOCAL_PRESET="wine-tkg-valve-exp"' >> proton-tkg.cfg
           sed -i 's/_nosteamruntime="false"/_nosteamruntime="sniper"/' proton-tkg-profiles/advanced-customization.cfg
           sed -i 's/_sdl_joy_support="false"/_sdl_joy_support="true"/' proton-tkg-profiles/advanced-customization.cfg
           sed -i 's/_NOLIB32="false"/_NOLIB32="true"/' proton-tkg-profiles/advanced-customization.cfg
