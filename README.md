@@ -5,7 +5,7 @@ This is a fork of [Wine-TKG-Git](https://github.com/Frogging-Family/wine-tkg-git
 
 Specifically, this is intended to fix things for Warudo and other software that uses those specific versions of Unity/Mono GC.
 
-This also includes some specific workarounds for Warudo to make launching it as simple as possible.
+This also includes some specific workarounds for Warudo to make launching it as simple as possible, and prevent a slow memory leak.
 
 ## Notes
 
@@ -17,9 +17,8 @@ This works as a stop-gap solution until all of that happens.
 
 ## Usage
 
-1. **Download the correct release for your situation:**
-- [Valve Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-rev5) if you need to use Spout2pw or want a release closer to Valve's Steam Proton that might be more compatible with other games.
-- [TKG Proton v3](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v3-tkg-valve-nr) if you want the most similar to the Wine-TKG-Git implementation and you do not need to use Spout2pw.
+1. **Download the latest release:**
+- [Valve Proton v4](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v4-tkg-valve-r2) 
 
 2. **Extract the zip to the compatability tools path:**
 - For directly installed Wine: `~/.local/share/Steam/compatibilitytools.d/` or `~/.steam/<something>/Steam/compatibilitytools.d/`
