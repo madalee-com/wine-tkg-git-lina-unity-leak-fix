@@ -18,7 +18,7 @@ This works as a stop-gap solution until all of that happens.
 ## Usage
 
 1. **Download the latest release:**
-- [Valve Proton v4](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v4-tkg-valve-r2) 
+- [TKG Proton Experimental - Lina Unity Leak Patch - Valve Proton v4 rev2](https://github.com/madalee-com/wine-tkg-git-lina-unity-leak-fix/releases/tag/v4-tkg-valve-r2) 
 
 2. **Extract the zip to the compatability tools path:**
 - For directly installed Wine: `~/.local/share/Steam/compatibilitytools.d/` or `~/.steam/<something>/Steam/compatibilitytools.d/`
