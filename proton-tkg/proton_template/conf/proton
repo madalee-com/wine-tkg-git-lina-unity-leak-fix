@@ -1354,6 +1354,11 @@ def default_compat_config():
         if appid in [
                 "2079120", #Warudo
                 ]:
+            ret.add("nonvapi")
+
+        if appid in [
+                "2079120", #Warudo
+                ]:
             ret.add("hidenvgpu")
     return ret
 
