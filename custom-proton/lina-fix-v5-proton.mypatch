@@ -211,7 +211,7 @@ index 00000000000..a28e860f017
 +}
 \ No newline at end of file
 diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
-index 110404c274c..a414c07ae28 100644
+index 110404c274c..b7cdb5b2530 100644
 --- a/dlls/ntdll/unix/signal_x86_64.c
 +++ b/dlls/ntdll/unix/signal_x86_64.c
 @@ -518,6 +518,7 @@ struct amd64_thread_data
@@ -253,7 +253,7 @@ index 110404c274c..a414c07ae28 100644
  
      RCX_sig( sigcontext ) = (ULONG64)frame;
      RSP_sig( sigcontext ) += sizeof(ULONG64);
-@@ -2918,6 +2927,59 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+@@ -2918,6 +2927,61 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
      abort_thread( 0 );
  }
  
@@ -264,7 +264,9 @@ index 110404c274c..a414c07ae28 100644
 + */
 +static void usr1_inside_syscall(struct xcontext *context)
 +{
-+    struct syscall_frame *frame = amd64_thread_data()->syscall_frame;
++    struct ntdll_thread_data *thread_data = ntdll_get_thread_data();
++    struct syscall_frame *frame = (struct syscall_frame *)(((ULONG_PTR)kernel_stack - frame_size) & ~(ULONG_PTR)63);
++
 +    ULONG64 saved_compaction = 0;
 +    I386_CONTEXT *wow_context;
 +
@@ -313,13 +315,14 @@ index 110404c274c..a414c07ae28 100644
  
  /**********************************************************************
   *		usr1_handler
-@@ -2927,54 +2989,34 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+@@ -2927,54 +2991,35 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
  static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
  {
      ucontext_t *ucontext = init_handler( sigcontext );
 -
 -    if (is_inside_syscall( RSP_sig(ucontext) ))
-+    struct syscall_frame *frame = amd64_thread_data()->syscall_frame;
++    struct ntdll_thread_data *thread_data = ntdll_get_thread_data();
++    struct syscall_frame *frame = (struct syscall_frame *)(((ULONG_PTR)kernel_stack - frame_size) & ~(ULONG_PTR)63);
 +    struct xcontext *context;
 +
 +    extern const void *__wine_syscall_dispatcher_save_end_ptr;
@@ -393,12 +396,12 @@ index 110404c274c..a414c07ae28 100644
          struct xcontext context;
  
          save_context( &context, ucontext );
-@@ -2982,7 +3024,24 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+@@ -2982,7 +3027,24 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
          if (is_wow64() && context.c.SegCs == cs64_sel) context.c.ContextFlags |= CONTEXT_EXCEPTION_ACTIVE;
          wait_suspend( &context.c );
          restore_context( &context, ucontext );
 +        return;
-     }
++    }
 +    /* Otherwise, interrupted within a syscall with a consistent user context. */
 +
 +    context = (struct xcontext *)(((ULONG_PTR)RSP_sig(ucontext) - 128 /* red zone */ - sizeof(*context)) & ~15);
@@ -407,7 +410,7 @@ index 110404c274c..a414c07ae28 100644
 +    {
 +        ERR_(seh)( "kernel stack overflow.\n" );
 +        return;
-+    }
+     }
 +    if (frame->restore_flags & RESTORE_FLAGS_INCOMPLETE_FRAME_CONTEXT)
 +    {
 +        frame->restore_flags &= ~RESTORE_FLAGS_INCOMPLETE_FRAME_CONTEXT;
@@ -418,7 +421,7 @@ index 110404c274c..a414c07ae28 100644
  }
  
  
-@@ -3005,7 +3064,10 @@ static void sigsys_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+@@ -3005,7 +3067,10 @@ static void sigsys_handler( int signal, siginfo_t *siginfo, void *sigcontext )
      frame->rcx = RIP_sig(ucontext);
      frame->eflags = EFL_sig(ucontext);
      frame->restore_flags = 0;
@@ -430,7 +433,7 @@ index 110404c274c..a414c07ae28 100644
      RCX_sig(ucontext) = (ULONG_PTR)frame;
      R11_sig(ucontext) = frame->eflags;
      if (EFL_sig(ucontext) & 0x100)
-@@ -3345,6 +3407,33 @@ __ASM_GLOBAL_FUNC( signal_start_thread,
+@@ -3345,6 +3410,33 @@ __ASM_GLOBAL_FUNC( signal_start_thread,
  /***********************************************************************
   *           __wine_syscall_dispatcher
   */
@@ -464,7 +467,7 @@ index 110404c274c..a414c07ae28 100644
  __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_gs_load") ":\n\t"
                     "movq %gs:0x378,%rcx\n\t"       /* thread_data->syscall_frame */
-@@ -3455,7 +3544,16 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+@@ -3455,7 +3547,16 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "syscall\n\t"
                     "leaq -0x98(%rbp),%rcx\n"
  #endif
@@ -482,7 +485,7 @@ index 110404c274c..a414c07ae28 100644
                     "movl 0xb0(%rcx),%eax\n\t"      /* frame->syscall_id */
                     "movq 0x18(%rcx),%r11\n\t"      /* 2nd argument */
                     "movl %eax,%ebx\n\t"
-@@ -3489,6 +3587,12 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+@@ -3489,6 +3590,12 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "movq 8(%r15),%r9\n\t"          /* 6th argument */
                     "callq *%r12\n\t"
                     "leaq -0x98(%rbp),%rcx\n\t"
@@ -495,7 +498,7 @@ index 110404c274c..a414c07ae28 100644
                     __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") ":\n\t"
                     /* push rbp-based kernel stack cfi */
                     __ASM_CFI(".cfi_remember_state\n\t")
-@@ -3603,12 +3707,14 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+@@ -3603,12 +3710,14 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "jz 3b\n\t"
                     "testl $0x2,%edx\n\t"          /* CONTEXT_INTEGER */
                     "jnz 1b\n\t"
@@ -511,7 +514,7 @@ index 110404c274c..a414c07ae28 100644
  
                     /* pop rbp-based kernel stack cfi */
                     __ASM_CFI("\t.cfi_restore_state\n")
-@@ -3655,18 +3761,6 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher_return,
+@@ -3655,18 +3764,6 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher_return,
                     "jnz " __ASM_LOCAL_LABEL("trace_syscall_ret" ) "\n\t"
                     "jmp " __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") )
  
@@ -530,7 +533,7 @@ index 110404c274c..a414c07ae28 100644
  
  /***********************************************************************
   *           __wine_unix_call_dispatcher
-@@ -3796,5 +3890,11 @@ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_gs_load_ptr"),
+@@ -3796,5 +3893,11 @@ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_gs_load_ptr"),
                        __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_gs_load") )
  __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_end_ptr"),
                        __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_end") )
