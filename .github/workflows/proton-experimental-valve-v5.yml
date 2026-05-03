@@ -18,6 +18,8 @@ jobs:
           chown user -R ..
           chown user -R /tmp
           export CARGO_HOME="$PWD"
+          mkdir yay
+          chown nobody yay
           sudo -u nobody /usr/bin/git clone https://aur.archlinux.org/yay.git
           cd yay
           sudo -u nobody makepkg -s
