@@ -292,7 +292,7 @@ _install_pkg() {
   "arch")
     _confirm_str=$([[ "${_confirm}" == "true" ]] && echo "y" || echo "")
     msg2 "Installing package: ${PKG} | Using pacman${_attempt_str}"
-    if ! eval "$(_auto_su)paru -S${_confirm_str} --needed \"${PKG}\""; then
+    if ! eval "$(_auto_su)yay -S${_confirm_str} --needed \"${PKG}\""; then
       warning "Failed to install package: ${PKG}"
       _failed="true"
     else

@@ -13,11 +13,12 @@ jobs:
       - name: Compile
         run: |
           echo -e "[multilib]\nInclude = /etc/pacman.d/mirrorlist" >> /etc/pacman.conf
-          pacman -Syu --noconfirm base-devel sudo lib32-jack2 paru
+          pacman -Syu --noconfirm base-devel sudo lib32-jack2
           useradd user -G wheel && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user -R ..
           chown user -R /tmp
           export CARGO_HOME="$PWD"
+          git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd ..
           cd proton-tkg
           sed -i 's/uninstaller="false"/uninstaller="true"/' proton-tkg.cfg
           sed -i 's/autoinstall="false"/autoinstall="true"/' proton-tkg.cfg
