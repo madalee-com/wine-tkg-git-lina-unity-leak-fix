@@ -211,7 +211,7 @@ index 00000000000..a28e860f017
 +}
 \ No newline at end of file
 diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
-index 110404c274c..6c3c9621f8d 100644
+index 110404c274c..7523b57b644 100644
 --- a/dlls/ntdll/unix/signal_x86_64.c
 +++ b/dlls/ntdll/unix/signal_x86_64.c
 @@ -518,6 +518,7 @@ struct amd64_thread_data
@@ -391,7 +391,7 @@ index 110404c274c..6c3c9621f8d 100644
 +        /* Fallthrough */
      }
 -    else
-+    else if (!is_inside_syscall( ucontext ))
++    else if (!is_inside_syscall( RSP_sig(ucontext) ))
      {
 +        /* Interrupted outside a syscall. */
          struct xcontext context;
