@@ -18,7 +18,7 @@ jobs:
           chown user -R ..
           chown user -R /tmp
           export CARGO_HOME="$PWD"
-          git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si --noconfirm && cd ..
+          git clone https://aur.archlinux.org/yay.git && cd yay && makepkg -si && cd ..
           cd proton-tkg
           sed -i 's/uninstaller="false"/uninstaller="true"/' proton-tkg.cfg
           sed -i 's/autoinstall="false"/autoinstall="true"/' proton-tkg.cfg
