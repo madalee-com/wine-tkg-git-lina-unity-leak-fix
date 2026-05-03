@@ -211,7 +211,7 @@ index 00000000000..a28e860f017
 +}
 \ No newline at end of file
 diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
-index 110404c274c..4865e98b8d9 100644
+index 110404c274c..de9b19259f1 100644
 --- a/dlls/ntdll/unix/signal_x86_64.c
 +++ b/dlls/ntdll/unix/signal_x86_64.c
 @@ -518,6 +518,7 @@ struct amd64_thread_data
@@ -273,14 +273,14 @@ index 110404c274c..4865e98b8d9 100644
 +    context->c.ContextFlags = CONTEXT_FULL | CONTEXT_SEGMENTS | CONTEXT_EXCEPTION_REQUEST;
 +
 +    NtGetContextThread( GetCurrentThread(), &context->c );
-+    if (xstate_extended_features())
++    if (xstate_extended_features)
 +    {
-+        if (xstate_compaction_enabled) frame->xstate.CompactionMask |= xstate_extended_features();
++        if (xstate_compaction_enabled) frame->xstate.CompactionMask |= xstate_extended_features;
 +        context_init_xstate( &context->c, &frame->xstate );
 +        saved_compaction = frame->xstate.CompactionMask;
 +    }
 +    wait_suspend( &context->c );
-+    if (xstate_extended_features()) frame->xstate.CompactionMask = saved_compaction;
++    if (xstate_extended_features) frame->xstate.CompactionMask = saved_compaction;
 +    if (context->c.ContextFlags & 0x40)
 +    {
 +        /* xstate is updated directly in frame's xstate */
