@@ -211,7 +211,7 @@ index 00000000000..a28e860f017
 +}
 \ No newline at end of file
 diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
-index 110404c274c..b7cdb5b2530 100644
+index 110404c274c..4865e98b8d9 100644
 --- a/dlls/ntdll/unix/signal_x86_64.c
 +++ b/dlls/ntdll/unix/signal_x86_64.c
 @@ -518,6 +518,7 @@ struct amd64_thread_data
@@ -265,7 +265,7 @@ index 110404c274c..b7cdb5b2530 100644
 +static void usr1_inside_syscall(struct xcontext *context)
 +{
 +    struct ntdll_thread_data *thread_data = ntdll_get_thread_data();
-+    struct syscall_frame *frame = (struct syscall_frame *)(((ULONG_PTR)kernel_stack - frame_size) & ~(ULONG_PTR)63);
++    struct syscall_frame *frame = (struct syscall_frame *)(((ULONG_PTR)thread_data->kernel_stack - frame_size) & ~(ULONG_PTR)63);
 +
 +    ULONG64 saved_compaction = 0;
 +    I386_CONTEXT *wow_context;
@@ -322,7 +322,7 @@ index 110404c274c..b7cdb5b2530 100644
 -
 -    if (is_inside_syscall( RSP_sig(ucontext) ))
 +    struct ntdll_thread_data *thread_data = ntdll_get_thread_data();
-+    struct syscall_frame *frame = (struct syscall_frame *)(((ULONG_PTR)kernel_stack - frame_size) & ~(ULONG_PTR)63);
++    struct syscall_frame *frame = (struct syscall_frame *)(((ULONG_PTR)thread_data->kernel_stack - frame_size) & ~(ULONG_PTR)63);
 +    struct xcontext *context;
 +
 +    extern const void *__wine_syscall_dispatcher_save_end_ptr;
