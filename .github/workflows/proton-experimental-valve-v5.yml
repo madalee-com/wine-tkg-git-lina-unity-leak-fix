@@ -17,6 +17,8 @@ jobs:
           useradd user -G wheel && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user -R ..
           chown user -R /tmp
+          mkdir /home/user
+          chown user -R /home/user
           export CARGO_HOME="$PWD"
           /usr/bin/git clone https://aur.archlinux.org/yay.git
           chown user -R yay
