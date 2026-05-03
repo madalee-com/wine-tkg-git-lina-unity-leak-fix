@@ -19,10 +19,10 @@ jobs:
           chown user -R /tmp
           export CARGO_HOME="$PWD"
           mkdir yay
-          chown nobody yay
-          sudo -u nobody /usr/bin/git clone https://aur.archlinux.org/yay.git
+          chown user yay
+          su user /usr/bin/git clone https://aur.archlinux.org/yay.git
           cd yay
-          sudo -u nobody makepkg -s
+          su user makepkg -s
           pacman -U *.pkg.tar.zst
           cd ..
           cd proton-tkg
