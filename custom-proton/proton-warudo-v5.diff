@@ -1,0 +1,18 @@
+--- proton	2026-05-04 14:53:25.968719028 -0400
++++ proton	2026-05-04 14:53:51.090890450 -0400
+@@ -1341,6 +1341,7 @@
+                 "435150", #Divinity: Original Sin 2 - Definitive Edition
+                 "2176900", #Fablecraft
+                 "2853730", #Skull and Bones
++                "2079120", #Warudo
+                 ]:
+             ret.add("disablenvapi")
+ 
+@@ -1369,6 +1370,7 @@
+ 
+         if appid in [
+                 "2698940", #The Crew Motorfest
++                "2079120", #Warudo
+                 ]:
+             ret.add("hidenvgpu")
+ 
