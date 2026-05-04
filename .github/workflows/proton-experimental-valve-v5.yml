@@ -24,7 +24,7 @@ jobs:
           chown user -R yay
           cd yay
           su user -c makepkg -s
-          pacman -Uy *.pkg.tar.zst
+          yes|pacman -U *.pkg.tar.zst
           cd ..
           cd proton-tkg
           sed -i 's/uninstaller="false"/uninstaller="true"/' proton-tkg.cfg
