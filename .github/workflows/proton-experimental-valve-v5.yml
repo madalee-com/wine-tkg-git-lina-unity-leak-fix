@@ -23,7 +23,7 @@ jobs:
           /usr/bin/git clone https://aur.archlinux.org/yay.git
           chown user -R yay
           cd yay
-          su user makepkg -s
+          su user -c makepkg -s
           pacman -Uy *.pkg.tar.zst
           cd ..
           cd proton-tkg
