@@ -211,7 +211,7 @@ index 00000000000..a28e860f017
 +}
 \ No newline at end of file
 diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
-index 110404c274c..7e0b531f09f 100644
+index 110404c274c..313f4fe1453 100644
 --- a/dlls/ntdll/unix/signal_x86_64.c
 +++ b/dlls/ntdll/unix/signal_x86_64.c
 @@ -496,11 +496,12 @@ struct syscall_frame
@@ -352,18 +352,27 @@ index 110404c274c..7e0b531f09f 100644
      return status;
  }
  
-@@ -2063,7 +2098,10 @@ static void sigsys_handler( int signal, siginfo_t *siginfo, void *sigcontext )
-     frame->rcx = RIP_sig(ucontext);
+@@ -2064,7 +2099,7 @@ static void sigsys_handler( int signal, siginfo_t *siginfo, void *sigcontext )
      frame->eflags = EFL_sig(ucontext);
      frame->restore_flags = 0;
+     if (instrumentation_callback) frame->restore_flags |= RESTORE_FLAGS_INSTRUMENTATION;
+-    RCX_sig(ucontext) = (ULONG_PTR)frame;
++        RCX_sig(ucontext) = (ULONG_PTR)frame;
+     R11_sig(ucontext) = frame->eflags;
+     if (EFL_sig(ucontext) & 0x100)
+     {
+@@ -2580,7 +2615,10 @@ static BOOL handle_syscall_trap( ucontext_t *sigcontext, siginfo_t *siginfo )
+     frame->rip = *(ULONG64 *)RSP_sig( sigcontext );
+     frame->eflags = EFL_sig(sigcontext);
+     frame->restore_flags = CONTEXT_CONTROL;
 -    if (instrumentation_callback) frame->restore_flags |= RESTORE_FLAGS_INSTRUMENTATION;
 +    if (instrumentation_callback) {
 +        frame->r10 = frame->rip;
 +        frame->restore_flags |= RESTORE_FLAGS_INSTRUMENTATION;
 +    }
-     RCX_sig(ucontext) = (ULONG_PTR)frame;
-     R11_sig(ucontext) = frame->eflags;
-     if (EFL_sig(ucontext) & 0x100)
+ 
+     RCX_sig( sigcontext ) = (ULONG64)frame;
+     RSP_sig( sigcontext ) += sizeof(ULONG64);
 @@ -2918,6 +2956,65 @@ static void quit_handler( int signal, siginfo_t *siginfo, void *sigcontext )
      abort_thread( 0 );
  }
@@ -534,18 +543,31 @@ index 110404c274c..7e0b531f09f 100644
 +    {
 +        ERR_(seh)( "kernel stack overflow.\n" );
 +        return;
-     }
++    }
 +    if (frame->restore_flags & RESTORE_FLAGS_INCOMPLETE_FRAME_CONTEXT)
 +    {
 +        frame->restore_flags &= ~RESTORE_FLAGS_INCOMPLETE_FRAME_CONTEXT;
 +        frame->eflags = 0x200;
 +        fixup_frame_fpu_state( frame, ucontext );
-+    }
+     }
 +    usr1_inside_syscall(context);
  }
  
  
-@@ -3213,6 +3318,8 @@ void init_syscall_frame( LPTHREAD_START_ROUTINE entry, void *arg, BOOL suspend,
+@@ -3005,7 +3110,11 @@ static void sigsys_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+     frame->rcx = RIP_sig(ucontext);
+     frame->eflags = EFL_sig(ucontext);
+     frame->restore_flags = 0;
+-    if (instrumentation_callback) frame->restore_flags |= RESTORE_FLAGS_INSTRUMENTATION;
++    if (instrumentation_callback) {
++        frame->r10 = frame->rip;
++        frame->restore_flags |= RESTORE_FLAGS_INSTRUMENTATION;
++    }
++
+     RCX_sig(ucontext) = (ULONG_PTR)frame;
+     R11_sig(ucontext) = frame->eflags;
+     if (EFL_sig(ucontext) & 0x100)
+@@ -3213,6 +3322,8 @@ void init_syscall_frame( LPTHREAD_START_ROUTINE entry, void *arg, BOOL suspend,
  
      assert( thread_data->frame_size == frame_size );
      thread_data->instrumentation_callback = &instrumentation_callback;
@@ -554,7 +576,7 @@ index 110404c274c..7e0b531f09f 100644
  
  #if defined __linux__
      arch_prctl( ARCH_SET_GS, teb );
-@@ -3345,6 +3452,29 @@ __ASM_GLOBAL_FUNC( signal_start_thread,
+@@ -3345,6 +3456,29 @@ __ASM_GLOBAL_FUNC( signal_start_thread,
  /***********************************************************************
   *           __wine_syscall_dispatcher
   */
@@ -584,7 +606,7 @@ index 110404c274c..7e0b531f09f 100644
  __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_gs_load") ":\n\t"
                     "movq %gs:0x378,%rcx\n\t"       /* thread_data->syscall_frame */
-@@ -3455,7 +3585,25 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+@@ -3455,7 +3589,25 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "syscall\n\t"
                     "leaq -0x98(%rbp),%rcx\n"
  #endif
@@ -611,7 +633,7 @@ index 110404c274c..7e0b531f09f 100644
                     "movl 0xb0(%rcx),%eax\n\t"      /* frame->syscall_id */
                     "movq 0x18(%rcx),%r11\n\t"      /* 2nd argument */
                     "movl %eax,%ebx\n\t"
-@@ -3489,6 +3637,15 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+@@ -3489,6 +3641,15 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "movq 8(%r15),%r9\n\t"          /* 6th argument */
                     "callq *%r12\n\t"
                     "leaq -0x98(%rbp),%rcx\n\t"
@@ -627,7 +649,7 @@ index 110404c274c..7e0b531f09f 100644
                     __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") ":\n\t"
                     /* push rbp-based kernel stack cfi */
                     __ASM_CFI(".cfi_remember_state\n\t")
-@@ -3604,11 +3761,14 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+@@ -3604,11 +3765,14 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
                     "testl $0x2,%edx\n\t"          /* CONTEXT_INTEGER */
                     "jnz 1b\n\t"
                     "xchgq %r10,(%rsp)\n\t"
@@ -642,7 +664,7 @@ index 110404c274c..7e0b531f09f 100644
  
                     /* pop rbp-based kernel stack cfi */
                     __ASM_CFI("\t.cfi_restore_state\n")
-@@ -3655,18 +3815,6 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher_return,
+@@ -3655,18 +3819,6 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher_return,
                     "jnz " __ASM_LOCAL_LABEL("trace_syscall_ret" ) "\n\t"
                     "jmp " __ASM_LOCAL_LABEL("__wine_syscall_dispatcher_return") )
  
@@ -661,7 +683,7 @@ index 110404c274c..7e0b531f09f 100644
  
  /***********************************************************************
   *           __wine_unix_call_dispatcher
-@@ -3796,5 +3944,11 @@ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_gs_load_ptr"),
+@@ -3796,5 +3948,11 @@ __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_gs_load_ptr"),
                        __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_gs_load") )
  __ASM_GLOBAL_POINTER( __ASM_NAME("__wine_unix_call_dispatcher_end_ptr"),
                        __ASM_LOCAL_LABEL("__wine_unix_call_dispatcher_end") )
