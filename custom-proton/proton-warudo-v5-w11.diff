@@ -1,0 +1,20 @@
+diff --git a/proton b/proton
+index c15a8a1f..839cb1ff 100755
+--- a/proton
++++ b/proton
+@@ -1341,6 +1341,7 @@ def default_compat_config():
+                 "435150", #Divinity: Original Sin 2 - Definitive Edition
+                 "2176900", #Fablecraft
+                 "2853730", #Skull and Bones
++                "2079120", #Warudo
+                 ]:
+             ret.add("disablenvapi")
+ 
+@@ -1369,6 +1370,7 @@ def default_compat_config():
+ 
+         if appid in [
+                 "2698940", #The Crew Motorfest
++                "2079120", #Warudo
+                 ]:
+             ret.add("hidenvgpu")
+ 
