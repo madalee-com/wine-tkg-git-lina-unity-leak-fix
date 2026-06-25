@@ -27,7 +27,7 @@ jobs:
           sed -i 's/_LOCAL_PRESET=""/_LOCAL_PRESET="valve"/' proton-tkg.cfg
           sed -i 's/_plain_version=""/_plain_version="proton_11.0"/' proton-tkg.cfg
           sed -i 's/_proton_branch=""/_proton_branch="proton_11.0"/' proton-tkg-profiles/advanced-customization.cfg
-          sed -i 's/_NOLIB32="false"/_NOLIB32="true"/' proton-tkg-profiles/advanced-customization.cfg
+          sed -i 's/_nosteamruntime="false"/_nosteamruntime="sniper"/' proton-tkg-profiles/advanced-customization.cfg
           sed -i 's/_use_staging="true"/_use_staging="false"/' proton-tkg.cfg
           #echo '_ci_build="true"' >> proton-tkg.cfg
           sed -i 's/_PROTON_NAME_ADDON=""/_PROTON_NAME_ADDON="lina-unity-leak-patch-v5"/' proton-tkg-profiles/advanced-customization.cfg
