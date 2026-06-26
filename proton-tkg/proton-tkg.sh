@@ -866,7 +866,7 @@ function build_in_valve_container {
 
   # Use latest container image from UMU
   # note regarding Proton (bleeding edge) 11: using steamrt4 instead for a little while due to missing deps in UMU image
-  if [ -z "$_bleeding_tag" ] && [ "$_unfrog" = "true" ]; then
+  if ( [ -z "$_bleeding_tag" ] && [ "$_unfrog" = "true" ] ) && ! ( [[ "$_custom_wine_source" = *"ValveSoftware"* ]] && [[ "$_plain_version" = *_11.0 ]] ); then
     sed -i "s|STEAMRT_IMAGE ?= registry.gitlab.steamos.cloud.*|STEAMRT_IMAGE ?= ghcr.io/open-wine-components/umu-sdk:latest|g" Makefile.in
   fi
 
