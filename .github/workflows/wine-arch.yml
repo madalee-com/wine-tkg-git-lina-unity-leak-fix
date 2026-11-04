@@ -21,6 +21,7 @@ jobs:
           useradd user -G wheel && echo "user ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
           chown user -R . && cd wine-tkg-git
           sed -i 's/wayland_driver="false"/wayland_driver="true"/' customization.cfg
+          sed -i 's/_NOLIB32="false"/_NOLIB32="wow64"/' wine-tkg-profiles/advanced-customization.cfg
           su user -c "yes|PKGDEST=/tmp/wine-tkg makepkg --noconfirm -s"
 
       - name: Archive the artifacts
