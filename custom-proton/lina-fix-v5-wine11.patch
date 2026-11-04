@@ -1,5 +1,5 @@
 diff --git a/dlls/ntdll/unix/signal_x86_64.c b/dlls/ntdll/unix/signal_x86_64.c
-index 751d955c564..723dfb2d9bf 100644
+index 751d955c564..5b58e5a57be 100644
 --- a/dlls/ntdll/unix/signal_x86_64.c
 +++ b/dlls/ntdll/unix/signal_x86_64.c
 @@ -520,8 +520,13 @@ struct amd64_thread_data
@@ -16,7 +16,7 @@ index 751d955c564..723dfb2d9bf 100644
  C_ASSERT( sizeof(struct amd64_thread_data) <= sizeof(((struct ntdll_thread_data *)0)->cpu_data) );
  C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, pthread_teb ) == 0x320 );
  C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, frame_size ) == 0x328 );
-@@ -535,6 +540,18 @@ static inline struct amd64_thread_data *amd64_thread_data(void)
+@@ -535,6 +540,16 @@ static inline struct amd64_thread_data *amd64_thread_data(void)
      return (struct amd64_thread_data *)ntdll_get_thread_data()->cpu_data;
  }
  
@@ -27,15 +27,13 @@ index 751d955c564..723dfb2d9bf 100644
 +
 +static inline void unblock_sigusr1(void)
 +{
-+    if (!--(amd64_thread_data()->sigusr1_blocked) &&
-+        amd64_thread_data()->sigusr1_pending)
-+        deferred_sigusr1();
++    amd64_thread_data()->sigusr1_blocked--;
 +}
 +
  static unsigned int frame_size;
  static unsigned int xstate_size = sizeof(XSAVE_AREA_HEADER);
  static UINT64 xstate_extended_features;
-@@ -2783,7 +2800,9 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+@@ -2783,7 +2798,9 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
              frame->eflags = 0x200;
              fixup_frame_fpu_state( frame, ucontext );
          }
@@ -45,7 +43,7 @@ index 751d955c564..723dfb2d9bf 100644
          if (xstate_extended_features)
          {
              if (user_shared_data->XState.CompactionEnabled)
-@@ -2806,7 +2825,9 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
+@@ -2806,7 +2823,9 @@ static void usr1_handler( int signal, siginfo_t *siginfo, void *sigcontext )
  
              cpu->Flags |= WOW64_CPURESERVED_FLAG_RESET_STATE;
          }
