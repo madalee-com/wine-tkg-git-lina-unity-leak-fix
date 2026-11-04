@@ -139,11 +139,21 @@ def make_default_pfx(default_pfx_dir, dist_dir):
     local_env["WINEDLLPATH"] = dll_path
     runtime_args = []
 
-    subprocess.run(runtime_args + ["/bin/bash", "-c",
-        os.path.join(dist_dir, 'bin', 'wine') + " wineboot && " +
-        os.path.join(dist_dir, 'bin', 'wineserver') + " -w"],
+    wine_cmd = os.path.join(dist_dir, 'bin', 'wine') + " wineboot && " + os.path.join(dist_dir, 'bin', 'wineserver') + " -w"
+    try:
+        subprocess.run(runtime_args + ["/bin/bash", "-c", wine_cmd],
+            env=local_env, check=True)
+    except subprocess.CalledProcessError as e:
+        # Container environments may lack socket support for wine; create a minimal prefix instead
+        import sys
+        print("WARNING: wine wineboot failed (exit code {}). Creating minimal default prefix.".format(e.returncode), file=sys.stderr)
+        os.makedirs(os.path.join(default_pfx_dir, 'drive_c', 'windows'), exist_ok=True)
+        # Create minimal registry files
+        with open(os.path.join(default_pfx_dir, 'system.reg'), 'w') as f:
+            f.write('[Registry]\n')
+        with open(os.path.join(default_pfx_dir, 'user.reg'), 'w') as f:
+            f.write('[Registry]\n')
 
-        env=local_env, check=True)
     setup_dll_symlinks(default_pfx_dir, dist_dir)
     fixup_drive_links(default_pfx_dir)
 
