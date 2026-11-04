@@ -1197,7 +1197,9 @@ _polish() {
 	  fi
 	  if [ "$_versioning_string" = "wine_srcdir" ]; then
 	    sed -i "s/\\\\\"\\\\\\\1.*\"/\\\\\"\\\\\\\1  ( ${_version_tags[*]} )\\\\\"/g" "${_versioning_path}"
-	    sed -i "s/\\\\\"\\\\\\\1.*\"/\\\\\"\\\\\\\1  ( ${_version_tags[*]} )\\\\\"/g" "${srcdir}/${_winesrcdir}/configure"
+	    if [ -e "${srcdir}/${_winesrcdir}/configure" ]; then
+	      sed -i "s/\\\\\"\\\\\\\1.*\"/\\\\\"\\\\\\\1  ( ${_version_tags[*]} )\\\\\"/g" "${srcdir}/${_winesrcdir}/configure"
+	    fi
 	  else
 	    sed -i "s/\"\\\1.*\"/\"\\\1  ( ${_version_tags[*]} )\"/g" "${_versioning_path}"
 	  fi
@@ -1207,7 +1209,9 @@ _polish() {
 	# Fix libldap detection on Arch
 	if [ -e /usr/bin/pacman ]; then
 	  if pacman -Qq libldap &> /dev/null; then
-	    sed -i "s|-lldap_r|-lldap|" "$srcdir/$_winesrcdir/configure"
+	    if [ -e "${srcdir}/${_winesrcdir}/configure" ]; then
+	      sed -i "s|-lldap_r|-lldap|" "$srcdir/$_winesrcdir/configure"
+	    fi
 	  fi
 	fi
 
