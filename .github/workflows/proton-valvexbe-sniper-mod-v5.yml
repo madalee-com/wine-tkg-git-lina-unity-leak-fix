@@ -35,6 +35,15 @@ jobs:
           tar -cvzf ../Proton-Lina-Unity-Leak-Patch-v5-XBE.tar.gz ./
           cd ..
           sha512sum Proton-Lina-Unity-Leak-Patch-v5-XBE.tar.gz > Proton-Lina-Unity-Leak-Patch-v5-XBE.sha512sum
+      - name: Archive prepare.log (debug)
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: prepare-log-debug
+          path: |
+            proton-tkg/wine-tkg-git/prepare.log
+            proton-tkg/wine-tkg-git/prepare.log.*
+          retention-days: 1
       - name: Archive tar gz
         uses: actions/upload-artifact@v5
         with:
