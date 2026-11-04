@@ -26,7 +26,7 @@ jobs:
           sed -i 's/_custom_wine_source=""/_custom_wine_source="https:\/\/github.com\/ValveSoftware\/wine.git"/' proton-tkg-profiles/advanced-customization.cfg
           #echo '_ci_build="true"' >> proton-tkg.cfg
           sed -i 's/_PROTON_NAME_ADDON=""/_PROTON_NAME_ADDON="lina-unity-leak-patch-v5"/' proton-tkg-profiles/advanced-customization.cfg
-          cp ../custom-proton/lina-fix-v5-wine11.patch ../wine-tkg-git/wine-tkg-userpatches/
+          cp ../custom-proton/lina-fix-v5-wine11.mypatch ../wine-tkg-git/wine-tkg-userpatches/
           yes|./proton-tkg.sh
           cd built
           cd proton_tkg_e*
