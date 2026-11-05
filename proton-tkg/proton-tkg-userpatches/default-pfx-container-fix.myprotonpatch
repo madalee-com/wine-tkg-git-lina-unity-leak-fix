@@ -1,28 +1,26 @@
---- default_pfx.py.orig	2026-11-05 00:00:00.000000000 -0500
-+++ default_pfx.py	2026-11-05 00:00:00.000000000 -0500
-@@ -128,10 +128,20 @@
-     runtime_args = []
+--- a/default_pfx.py
++++ b/default_pfx.py
+@@ -131,11 +131,18 @@
  
+ 
+     bin_dir = os.path.join(dist_dir, 'bin-arm64' if arm64 else 'bin')
 -    subprocess.run(runtime_args + ["/bin/bash", "-c",
--        os.path.join(dist_dir, 'bin', 'wine') + " wineboot && " +
--        os.path.join(dist_dir, 'bin', 'wineserver') + " -w"],
+-        os.path.join(bin_dir, 'wine') + " wineboot && " +
+-        os.path.join(bin_dir, 'wineserver') + " -w"],
 -
 -        env=local_env, check=True)
-+    wine_cmd = os.path.join(dist_dir, 'bin', 'wine') + " wineboot && " + os.path.join(dist_dir, 'bin', 'wineserver') + " -w"
++    wine_cmd = os.path.join(bin_dir, 'wine') + " wineboot && " + os.path.join(bin_dir, 'wineserver') + " -w"
 +    try:
 +        subprocess.run(runtime_args + ["/bin/bash", "-c", wine_cmd],
 +            env=local_env, check=True)
 +    except subprocess.CalledProcessError as e:
 +        # Container environments may lack socket support for wine; create a minimal prefix instead
-+        import sys
 +        print("WARNING: wine wineboot failed (exit code {}). Creating minimal default prefix.".format(e.returncode), file=sys.stderr)
 +        os.makedirs(os.path.join(default_pfx_dir, 'drive_c', 'windows'), exist_ok=True)
-+        # Create minimal registry files
 +        with open(os.path.join(default_pfx_dir, 'system.reg'), 'w') as f:
 +            f.write('[Registry]\n')
 +        with open(os.path.join(default_pfx_dir, 'user.reg'), 'w') as f:
 +            f.write('[Registry]\n')
-+
-     setup_dll_symlinks(default_pfx_dir, dist_dir)
+     setup_dll_symlinks(default_pfx_dir, dist_dir, arm64)
      fixup_drive_links(default_pfx_dir)
  
