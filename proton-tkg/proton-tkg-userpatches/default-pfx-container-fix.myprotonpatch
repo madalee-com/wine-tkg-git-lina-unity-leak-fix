@@ -68,7 +68,7 @@
 +"TMP" = "%SystemDrive%\\tmp"
 +
 +[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall]
-+"""
++'''
 +
 +    with open(os.path.join(default_pfx_dir, 'system.reg'), 'w') as f:
 +        f.write(system_reg)
@@ -79,7 +79,7 @@
 +version = win32
 +
 +[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run]
-+"""
++'''
 +
 +    with open(os.path.join(default_pfx_dir, 'user.reg'), 'w') as f:
 +        f.write(user_reg)
