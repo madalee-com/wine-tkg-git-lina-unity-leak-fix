@@ -1,6 +1,14 @@
---- a/default_pfx.py
-+++ b/default_pfx.py
-@@ -125,11 +125,93 @@
+--- a/proton_template/default_pfx.py	2026-11-06 10:47:45.853218641 -0500
++++ b/proton_template/default_pfx.py	2026-11-06 09:52:56.626971686 -0500
+@@ -7,6 +7,7 @@
+ import os
+ import subprocess
+ import re
++import sys
+ 
+ def file_is_wine_builtin_dll(path):
+     if not os.path.exists(path):
+@@ -125,7 +126,107 @@
      for walk_dir, dirs, files in os.walk(os.path.join(default_pfx_dir, "dosdevices")):
          for dir_ in dirs:
              if ":" in dir_:
@@ -9,7 +17,7 @@
 +                # Preserve symlinks (valid drive mappings like c:), only remove stale directories
 +                if not os.path.islink(full_path):
 +                    os.remove(full_path)
- 
++
 +def create_manual_prefix(default_pfx_dir):
 +    """Create a minimal but valid Windows prefix when wineboot cannot run.
 +    
@@ -106,12 +114,10 @@
 +    
 +    print("Created manual default prefix at {}".format(default_pfx_dir), file=sys.stderr)
 +
+ 
  def make_default_pfx(default_pfx_dir, dist_dir):
      local_env = dict(os.environ)
- 
-@@ -140,13 +222,12 @@
-     wine_cmd = os.path.join(dist_dir, 'bin', 'wine') + " wineboot && " + os.path.join(dist_dir, 'bin', 'wineserver') + " -w"
-     try:
+@@ -144,15 +245,9 @@
          subprocess.run(runtime_args + ["/bin/bash", "-c", wine_cmd],
              env=local_env, check=True)
      except subprocess.CalledProcessError as e:
@@ -127,5 +133,6 @@
 +        # Container environments may lack socket support for wine; create a complete manual prefix instead
 +        print("WARNING: wine wineboot failed (exit code {}). Creating manual default prefix.".format(e.returncode), file=sys.stderr)
 +        create_manual_prefix(default_pfx_dir)
+ 
      setup_dll_symlinks(default_pfx_dir, dist_dir)
      fixup_drive_links(default_pfx_dir)
