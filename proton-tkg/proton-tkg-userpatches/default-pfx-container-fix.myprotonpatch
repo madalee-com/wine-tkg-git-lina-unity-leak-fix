@@ -1,5 +1,5 @@
---- a/proton_template/default_pfx.py	2026-11-06 10:47:45.853218641 -0500
-+++ b/proton_template/default_pfx.py	2026-11-06 09:52:56.626971686 -0500
+--- a/default_pfx.py
++++ b/default_pfx.py
 @@ -7,6 +7,7 @@
  import os
  import subprocess
@@ -8,7 +8,7 @@
  
  def file_is_wine_builtin_dll(path):
      if not os.path.exists(path):
-@@ -125,7 +126,107 @@
+@@ -115,7 +116,76 @@
      for walk_dir, dirs, files in os.walk(os.path.join(default_pfx_dir, "dosdevices")):
          for dir_ in dirs:
              if ":" in dir_:
@@ -20,12 +20,12 @@
 +
 +def create_manual_prefix(default_pfx_dir):
 +    """Create a minimal but valid Windows prefix when wineboot cannot run.
-+    
++
 +    Produces a structurally complete prefix with proper registry files,
 +    directory layout, and dosdevices symlinks that Proton can use.
 +    """
 +    import sys
-+    
++
 +    # Create full directory structure
 +    dirs = [
 +        'drive_c',
@@ -38,7 +38,7 @@
 +    ]
 +    for d in dirs:
 +        os.makedirs(os.path.join(default_pfx_dir, d), exist_ok=True)
-+    
++
 +    # Create dosdevices/c: symlink to drive_c
 +    c_link = os.path.join(default_pfx_dir, 'dosdevices', 'c:')
 +    if not os.path.exists(c_link):
@@ -47,7 +47,7 @@
 +        except OSError:
 +            # Fallback for systems without symlink support
 +            pass
-+    
++
 +    # Generate minimal but valid system.reg with standard Windows keys
 +    system_reg = '''[Registry]
 +
@@ -58,81 +58,58 @@
 +"CommonFilesDir" = "%ProgramFiles%\\Common Files"
 +"SystemRoot" = "%SystemRoot%"
 +"SystemDrive" = "C:"
-+"windir" = "%SystemRoot%"
++"Windir" = "%SystemRoot%"
 +"ProgramFilesPath" = "%ProgramFiles%"
-+"CommonFilesPath" = "%CommonFilesDir%"
++"CommonFilesPath" = "%CommonFiles%"
 +
 +[HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Session Manager\\Environment]
-+"TEMP" = "%USERPROFILE%\\AppData\\Local\\Temp"
-+"TMP" = "%USERPROFILE%\\AppData\\Local\\Temp"
++"Path" = "%SystemRoot%\\system32;%SystemRoot%;%SystemRoot%\\System32\\Wbem"
++"TEMP" = "%SystemDrive%\\tmp"
++"TMP" = "%SystemDrive%\\tmp"
 +
-+[HKEY_LOCAL_MACHINE\\Hardware\\Descriptions\\System]
-+"CentralProcessor\\0" = "x86 Family 6 Model 142 Stepping 10"
-+'''
++[HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall]
++"""
++
 +    with open(os.path.join(default_pfx_dir, 'system.reg'), 'w') as f:
 +        f.write(system_reg)
-+    
-+    # Generate minimal but valid user.reg with standard user keys
++
++    # Generate minimal user.reg
 +    user_reg = '''[Registry]
 +
 +version = win32
 +
-+[HKEY_CURRENT_USER\\Environment]
-+"TEMP" = "%USERPROFILE%\\AppData\\Local\\Temp"
-+"TMP" = "%USERPROFILE%\\AppData\\Local\\Temp"
-+"USERPROFILE" = "%USERPROFILE%"
++[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run]
++"""
 +
-+[HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Folders]
-+"AppData" = "%USERPROFILE%\\AppData\\Roaming"
-+"Local AppData" = "%USERPROFILE%\\AppData\\Local"
-+"Desktop" = "%USERPROFILE%\\Desktop"
-+"Favorites" = "%USERPROFILE%\\Favorites"
-+"My Documents" = "%USERPROFILE%\\My Documents"
-+
-+[HKEY_CURRENT_USER\\Software\\Wine]
-+"Version" = "win10"
-+'''
 +    with open(os.path.join(default_pfx_dir, 'user.reg'), 'w') as f:
 +        f.write(user_reg)
-+    
-+    # Create placeholder files for essential system components
-+    placeholders = [
-+        'drive_c/windows/System32/config/SYSTEM',
-+        'drive_c/windows/System32/config/SOFTWARE',
-+        'drive_c/windows/System32/config/default',
-+        'drive_c/windows/System32/config/SAM',
-+        'drive_c/windows/System32/config/SECURITY',
-+        'drive_c/users/Default User/Desktop',
-+    ]
-+    for p in placeholders:
-+        full_path = os.path.join(default_pfx_dir, p)
-+        dir_path = os.path.dirname(full_path)
-+        os.makedirs(dir_path, exist_ok=True)
-+        # Create empty placeholder files (wine expects them to exist)
-+        if not os.path.exists(full_path):
-+            open(full_path, 'w').close()
-+    
-+    print("Created manual default prefix at {}".format(default_pfx_dir), file=sys.stderr)
-+
  
- def make_default_pfx(default_pfx_dir, dist_dir):
+ def make_default_pfx(default_pfx_dir, dist_dir, arm64):
      local_env = dict(os.environ)
-@@ -144,15 +245,9 @@
-         subprocess.run(runtime_args + ["/bin/bash", "-c", wine_cmd],
-             env=local_env, check=True)
-     except subprocess.CalledProcessError as e:
--        # Container environments may lack socket support for wine; create a minimal prefix instead
--        import sys
--        print("WARNING: wine wineboot failed (exit code {}). Creating minimal default prefix.".format(e.returncode), file=sys.stderr)
--        os.makedirs(os.path.join(default_pfx_dir, 'drive_c', 'windows'), exist_ok=True)
--        # Create minimal registry files
--        with open(os.path.join(default_pfx_dir, 'system.reg'), 'w') as f:
--            f.write('[Registry]\n')
--        with open(os.path.join(default_pfx_dir, 'user.reg'), 'w') as f:
--            f.write('[Registry]\n')
+@@ -131,13 +201,19 @@
+ 
+ 
+     bin_dir = os.path.join(dist_dir, 'bin-arm64' if arm64 else 'bin')
+-    subprocess.run(runtime_args + ["/bin/bash", "-c",
+-        os.path.join(bin_dir, 'wine') + " wineboot && " +
+-        os.path.join(bin_dir, 'wineserver') + " -w"],
+-
+-        env=local_env, check=True)
+-    setup_dll_symlinks(default_pfx_dir, dist_dir, arm64)
+-    fixup_drive_links(default_pfx_dir)
++    try:
++        subprocess.run(runtime_args + ["/bin/bash", "-c",
++            os.path.join(bin_dir, 'wine') + " wineboot && " +
++            os.path.join(bin_dir, 'wineserver') + " -w"],
++
++            env=local_env, check=True)
++    except subprocess.CalledProcessError as e:
 +        # Container environments may lack socket support for wine; create a complete manual prefix instead
 +        print("WARNING: wine wineboot failed (exit code {}). Creating manual default prefix.".format(e.returncode), file=sys.stderr)
 +        create_manual_prefix(default_pfx_dir)
++    else:
++        setup_dll_symlinks(default_pfx_dir, dist_dir, arm64)
++        fixup_drive_links(default_pfx_dir)
  
-     setup_dll_symlinks(default_pfx_dir, dist_dir)
-     fixup_drive_links(default_pfx_dir)
+     filter_registry(os.path.join(default_pfx_dir, 'user.reg'))
+     filter_registry(os.path.join(default_pfx_dir, 'system.reg'))
