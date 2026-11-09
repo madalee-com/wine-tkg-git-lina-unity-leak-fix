@@ -1,0 +1,27 @@
+@@ -, +, @@ 
+---
+ dlls/ntdll/unix/signal_x86_64.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+--- a/dlls/ntdll/unix/signal_x86_64.c	
++++ a/dlls/ntdll/unix/signal_x86_64.c	
+@@ -3171,7 +3171,18 @@ __ASM_GLOBAL_FUNC( __wine_syscall_dispatcher,
+                    /* push rbp-based kernel stack cfi */
+                    __ASM_CFI(".cfi_remember_state\n\t")
+                    __ASM_CFI_CFA_IS_AT2(rcx, 0xa8, 0x01) /* frame->syscall_cfa */
+-                   "leaq 0x70(%rcx),%rsp\n\t"      /* %rsp > frame means no longer inside syscall */
++
++                   /* switch to user stack */
++                   /* %rsp outside kernel stack means no longer inside syscall */
++                   "movq 0x88(%rcx),%rsp\n\t"
++
++                   "movl 0xb4(%rcx),%edx\n\t"      /* frame->restore_flags */
++                   "testl $0x1,%edx\n\t"           /* CONTEXT_CONTROL | CONTEXT_INTEGER */
++                   "jz 1f\n\t"
++                   /* Set up rsp for iretq return paths below */
++                   "leaq 0x70(%rcx),%rsp\n\t"
++                   "1:\n\t"
++
+ #ifdef __linux__
+                    "movw 0x338(%r13),%dx\n"        /* amd64_thread_data()->fs */
+                    "testw %dx,%dx\n\t"
+-- 

@@ -1,0 +1,34 @@
+--- proton	2026-03-15 22:17:14.747045322 -0400
++++ proton	2026-03-15 22:17:42.961243977 -0400
+@@ -1350,6 +1350,19 @@
+                 "1249800", #xuan-yuan sword VII
+                 ]:
+             ret.add("enablenvapi")
++
++        if appid in [
++                # disable dxvknvapi for titles which dislike it
++                "1088850", #Marvel's Guardians of the Galaxy
++                "1418100", #Swords of Legends Online
++                "2080180", #Go Home Annie Demo
++                "1939100", #Go Home Annie
++                "435150", #Divinity: Original Sin 2 - Definitive Edition
++                "2176900", #Fablecraft
++                "2853730", #Skull and Bones
++                "2079120", #Warudo
++                ]:
++            ret.add("nonvapi")
+     return ret
+ 
+ class Session:
+@@ -1397,7 +1410,10 @@
+ 
+         prepend_to_env_str(self.env, ld_path_var, g_proton.lib64_dir + ":" + g_proton.lib_dir + ":" + g_proton.lib64_dir + "x86_64-unix/:" + g_proton.lib_dir + "i386-unix/", ":")
+ 
+-        self.env["WINEDLLPATH"] = g_proton.lib64_dir + ":" + g_proton.lib_dir
++        dllpaths = [g_proton.lib64_dir + ":" + g_proton.lib_dir, g_proton.lib64_dir + "vkd3d", g_proton.lib_dir + "vkd3d", g_proton.lib64_dir + "wine", g_proton.lib_dir + "wine"]
++        if "WINEDLLPATH" in os.environ:
++            dllpaths.append(os.environ["WINEDLLPATH"])
++        self.env["WINEDLLPATH"] = ':'.join(dllpaths)
+ 
+         self.env["GST_PLUGIN_SYSTEM_PATH_1_0"] = g_proton.lib64_dir + "gstreamer-1.0" + ":" + g_proton.lib_dir + "gstreamer-1.0"
+         self.env["WINE_GST_REGISTRY_DIR"] = g_compatdata.path("gstreamer-1.0/")

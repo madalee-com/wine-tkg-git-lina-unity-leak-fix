@@ -266,8 +266,10 @@ function build_vrclient {
       fi
     fi
   else
+    mkdir -p proton_dist_tmp/$_lib64name/wine/fakedlls
     cp -v "${_nowhere}"/openvr/build/vrclient.win64/vrclient_x64/vrclient_x64.dll.so proton_dist_tmp/$_lib64name/wine/ && cp -v "${_nowhere}"/openvr/build/vrclient.win64/vrclient_x64.dll.fake proton_dist_tmp/$_lib64name/wine/fakedlls/vrclient_x64.dll
     if [ "$_NOLIB32" = "false" ]; then
+      mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
       cp -v "${_nowhere}"/openvr/build/vrclient.win32/vrclient/vrclient.dll.so proton_dist_tmp/$_lib32name/wine/ && cp -v "${_nowhere}"/openvr/build/vrclient.win32/vrclient.dll.fake proton_dist_tmp/$_lib32name/wine/fakedlls/vrclient.dll
     fi
   fi
@@ -308,10 +310,10 @@ function build_lsteamclient {
   winemaker $WINEMAKERFLAGS --dll -DSTEAM_API_EXPORTS -Dprivate=public -Dprotected=public .
   sed -re 's@_LDFLAGS=@_LDFLAGS= -static-libgcc -static-libstdc++ -ldl @' -i "$_nowhere/Proton/build/lsteamclient.win64/Makefile"
   make -e CC="winegcc -m64" CXX="wineg++ -m64 $_cxx_addon" -C "$_nowhere/Proton/build/lsteamclient.win64" -j$(nproc) && strip --strip-debug lsteamclient.dll.so || exit 1
-  if [ "$_new_lib_paths_69" = "true" ]; then
+  #if [ "$_new_lib_paths_69" != "true" ]; then
     touch "$_nowhere/Proton/build/lsteamclient.win64/steamclient.spec"
     winebuild --dll --fake-module -m64 -E "$_nowhere/Proton/build/lsteamclient.win64/steamclient.spec" --dll-name=lsteamclient -o lsteamclient.dll.fake || exit 1
-  fi
+  #fi
   cd ../..
 
   cd build/lsteamclient.win32
@@ -320,10 +322,10 @@ function build_lsteamclient {
     sed -re 's@_LDFLAGS=@_LDFLAGS= -static-libgcc -static-libstdc++ -ldl @' -i "$_nowhere/Proton/build/lsteamclient.win32/Makefile"
     make -e CC="winegcc -m32" CXX="wineg++ -m32 $_cxx_addon" -C "$_nowhere/Proton/build/lsteamclient.win32" -j$(nproc) && strip --strip-debug lsteamclient.dll.so || exit 1
   fi
-  if [ "$_new_lib_paths_69" = "true" ]; then
+  #if [ "$_new_lib_paths_69" != "true" ]; then
     touch "$_nowhere/Proton/build/lsteamclient.win32/steamclient.spec"
     winebuild --dll --fake-module -m32 -E "$_nowhere/Proton/build/lsteamclient.win32/steamclient.spec" --dll-name=lsteamclient -o lsteamclient.dll.fake || exit 1
-  fi
+  #fi
   cd "$_nowhere"
 
   # Inject lsteamclient libs in our wine-tkg-git build
@@ -348,6 +350,8 @@ function build_lsteamclient {
   else
     cp -v Proton/build/lsteamclient.win64/lsteamclient.dll.so proton_dist_tmp/$_lib64name/wine/
     cp -v Proton/build/lsteamclient.win32/lsteamclient.dll.so proton_dist_tmp/$_lib32name/wine/
+    mkdir -p proton_dist_tmp/$_lib64name/wine/fakedlls
+    mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
     cp -v Proton/build/lsteamclient.win64/lsteamclient.dll.fake proton_dist_tmp/$_lib64name/wine/fakedlls/lsteamclient.dll
     cp -v Proton/build/lsteamclient.win32/lsteamclient.dll.fake proton_dist_tmp/$_lib32name/wine/fakedlls/lsteamclient.dll
   fi
@@ -548,10 +552,10 @@ function build_steamhelper {
       fi
     fi
 
-    if [ "$_new_lib_paths_69" = "true" ]; then
+    #if [ "$_new_lib_paths_69" != "true" ]; then
       touch "$_nowhere/Proton/build/steam.win32/steam.spec"
       winebuild --exe --fake-module -m32 -E "$_nowhere/Proton/build/steam.win32/steam.spec" --dll-name=steam -o steam.exe.fake || exit 1
-    fi
+    #fi
 
     # 64-bit
     if [ -e "$_nowhere"/Proton/steam_helper/64/libsteam_api.so ]; then
@@ -603,9 +607,12 @@ function build_steamhelper {
         cp -v Proton/build/steam.win64/64/libsteam_api.so proton_dist_tmp/$_lib64name/
       fi
     else
+      mkdir -p proton_dist_tmp/$_lib32name/wine/fakedlls
       cp -v Proton/build/steam.win32/steam.exe.fake proton_dist_tmp/$_lib32name/wine/fakedlls/steam.exe
       cp -v Proton/build/steam.win32/steam.exe.so proton_dist_tmp/$_lib32name/wine/
-      cp -v Proton/build/steam.win32/libsteam_api.so proton_dist_tmp/$_lib32name/
+      if [ -e Proton/build/steam.win32/libsteam_api.so ]; then
+        cp -v Proton/build/steam.win32/libsteam_api.so proton_dist_tmp/$_lib32name/
+      fi
     fi
   fi
 }
@@ -858,7 +865,7 @@ function build_in_valve_container {
 
   # Use latest container image from UMU
   # note regarding Proton (bleeding edge) 11: using steamrt4 instead for a little while due to missing deps in UMU image
-  if [ -z "$_bleeding_tag" ] && [ "$_unfrog" = "true" ]; then
+  if ( [ -z "$_bleeding_tag" ] && [ "$_unfrog" = "true" ] ) && ! ( [[ "$_custom_wine_source" = *"ValveSoftware"* ]] && [[ "$_plain_version" = *_11.0 ]] ); then
     sed -i "s|STEAMRT_IMAGE ?= registry.gitlab.steamos.cloud.*|STEAMRT_IMAGE ?= ghcr.io/open-wine-components/umu-sdk:latest|g" Makefile.in
   fi
 
@@ -868,6 +875,13 @@ function build_in_valve_container {
     _configure_flags+=" --relabel-volumes"
   fi
   ../configure.sh $_configure_flags
+
+  # Patch upstream default_pfx.py to handle restricted container environments
+  # where socket support is unavailable (wine wineboot fails with "socket: Function not implemented").
+  # Our proton_template version runs wine wineboot/wineserver without check=True,
+  # allowing the build to continue even when socket calls fail.
+  cp "$_wine_tkg_git_path"/proton_template/default_pfx.py ../default_pfx.py
+
   make redist
   echo "_proton_pkgdest='$_nowhere/external-resources/Proton/build/redist'" >> "$_nowhere"/proton_tkg_token
 }
