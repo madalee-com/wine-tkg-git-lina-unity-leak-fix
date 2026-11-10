@@ -7,7 +7,6 @@
 import os
 import subprocess
 import re
-import sys
 
 def file_is_wine_builtin_dll(path):
     if not os.path.exists(path):
@@ -126,10 +125,7 @@ def fixup_drive_links(default_pfx_dir):
     for walk_dir, dirs, files in os.walk(os.path.join(default_pfx_dir, "dosdevices")):
         for dir_ in dirs:
             if ":" in dir_:
-                full_path = os.path.join(walk_dir, dir_)
-                # Preserve symlinks (valid drive mappings like c:), only remove stale directories
-                if not os.path.islink(full_path):
-                    os.remove(full_path)
+                os.remove(os.path.join(walk_dir, dir_))
 
 def make_default_pfx(default_pfx_dir, dist_dir):
     local_env = dict(os.environ)
@@ -143,26 +139,11 @@ def make_default_pfx(default_pfx_dir, dist_dir):
     local_env["WINEDLLPATH"] = dll_path
     runtime_args = []
 
-    # Try wine wineboot, but don't fail if it errors (e.g. in restricted
-    # container environments where socket support is unavailable).
-    # The prefix directory is still created and can be used afterwards.
-    wineboot_cmd = os.path.join(dist_dir, 'bin', 'wine') + " wineboot"
-    wineserver_cmd = os.path.join(dist_dir, 'bin', 'wineserver') + " -w"
-    print("Running wine wineboot...", file=sys.stderr)
-    wineboot_result = subprocess.run(runtime_args + ["/bin/bash", "-c", wineboot_cmd], env=local_env)
-    if wineboot_result.returncode != 0:
-        print("WARNING: 'wine wineboot' returned non-zero exit status %d. "
-              "This can happen in restricted container environments without "
-              "full socket support. Continuing anyway — prefix directory was "
-              "still created." % wineboot_result.returncode, file=sys.stderr)
+    subprocess.run(runtime_args + ["/bin/bash", "-c",
+        os.path.join(dist_dir, 'bin', 'wine') + " wineboot && " +
+        os.path.join(dist_dir, 'bin', 'wineserver') + " -w"],
 
-    # Try wineserver -w but don't fail if it errors either.
-    print("Running wineserver -w...", file=sys.stderr)
-    wineserver_result = subprocess.run(runtime_args + ["/bin/bash", "-c", wineserver_cmd], env=local_env)
-    if wineserver_result.returncode != 0:
-        print("WARNING: 'wineserver -w' returned non-zero exit status %d. "
-              "Continuing anyway." % wineserver_result.returncode, file=sys.stderr)
-
+        env=local_env, check=True)
     setup_dll_symlinks(default_pfx_dir, dist_dir)
     fixup_drive_links(default_pfx_dir)
 
