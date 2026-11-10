@@ -39,3 +39,7 @@ proton-tkg/proton_dist_tmp/
 proton-tkg/proton_tkg_token
 proton-tkg/external-resources
 proton-tkg/gst/
+
+# temp repos for patch generation
+.wine-exp11/
+__pycache__/
