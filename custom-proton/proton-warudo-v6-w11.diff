@@ -1,0 +1,16 @@
+--- a/proton
++++ b/proton
+@@ -1403,11 +1403,13 @@
+                 "2176900", #Fablecraft
+                 "2853730", #Skull and Bones
+                 "1761380", #Otherworld Legends (just to disable nvcuda.dll)
++                "2079120", #Warudo
+                 ]:
+             ret.add("disablenvapi")
+ 
+         if appid in [
+                 "2698940", #The Crew Motorfest
++                "2079120", #Warudo
+                 ]:
+             ret.add("hidenvgpu")
+ 
