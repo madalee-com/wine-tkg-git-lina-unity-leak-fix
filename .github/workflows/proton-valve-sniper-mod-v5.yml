@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Free Disk Space
@@ -52,7 +52,7 @@ jobs:
           path: proton-tkg/Proton-Lina-Unity-Leak-Patch-v5.sha512sum
 
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build]
     steps:
       - name: Download all workflow run artifacts
