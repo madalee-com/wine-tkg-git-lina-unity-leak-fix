@@ -30,7 +30,7 @@ jobs:
           yes|./proton-tkg.sh
           cd built
           cd proton_tkg_e*
-          # Warudo support (disablenvapi + hidenvgpu) is already in proton_template/conf/proton
+          patch < ../../../custom-proton/proton-warudo-v6-w11.diff
           cd ..
           tar -cvzf ../Proton-Lina-Unity-Leak-Patch-v6-XBE.tar.gz ./
           cd ..
