@@ -19,6 +19,19 @@ jobs:
       - name: Display Analysis
         run: echo '${{ steps.cleanup.outputs.space-analysis }}'
       - uses: actions/checkout@v4
+      - name: Verify socket support (wine needs AF_UNIX)
+        run: |
+          python3 - <<'PY'
+          import socket, sys
+          try:
+              s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+              s.close()
+          except OSError as e:
+              print(f"Runner cannot create AF_UNIX sockets: {e}", file=sys.stderr)
+              print("This build requires AF_UNIX socket support (used by wineserver).", file=sys.stderr)
+              sys.exit(1)
+          print("AF_UNIX socket support OK")
+          PY
       - name: Compile
         run: |
           cd proton-tkg
