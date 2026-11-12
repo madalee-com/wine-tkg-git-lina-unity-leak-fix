@@ -1,0 +1,159 @@
+--- a/dlls/ntdll/unix/signal_x86_64.c	2026-11-11 18:04:11.287168073 -0500
++++ b/dlls/ntdll/unix/signal_x86_64.c	2026-11-11 19:07:15.595623619 -0500
+@@ -497,7 +497,7 @@
+     void                 *syscall_cfa;   /* 00a8 */
+     DWORD                 syscall_id;    /* 00b0 */
+     DWORD                 restore_flags; /* 00b4 */
+-    DWORD                 align[2];      /* 00b8 */
++    ULONG64               retval;        /* 00b8 - syscall return value for deferred USR1 handling */
+     XSAVE_FORMAT          xsave;         /* 00c0 */
+     DECLSPEC_ALIGN(64) XSAVE_AREA_HEADER xstate;    /* 02c0 */
+ };
+@@ -520,6 +520,8 @@
+     DWORD                 fs;            /* 0338 WOW TEB selector */
+     DWORD                 mxcsr;         /* 033c Unix-side mxcsr register */
+     char                  syscall_dispatch; /* 0340 */
++    volatile char           sigusr1_blocked;   /* 0341 refcount of block_sigusr1() calls */
++    volatile char           sigusr1_pending;   /* 0342 SIGUSR1 pending while blocked */
+ };
+ 
+ C_ASSERT( sizeof(struct amd64_thread_data) <= sizeof(((struct ntdll_thread_data *)0)->cpu_data) );
+@@ -529,6 +531,8 @@
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, fs ) == 0x338 );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, mxcsr ) == 0x33c );
+ C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, syscall_dispatch ) == 0x340 );
++C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, sigusr1_blocked ) == 0x341 );
++C_ASSERT( offsetof( TEB, GdiTebBatch ) + offsetof( struct amd64_thread_data, sigusr1_pending ) == 0x342 );
+ 
+ static inline struct amd64_thread_data *amd64_thread_data(void)
+ {
+@@ -1134,6 +1138,8 @@
+  */
+ NTSTATUS WINAPI NtSetContextThread( HANDLE handle, const CONTEXT *context )
+ {
++    block_sigusr1();
++
+     NTSTATUS ret = STATUS_SUCCESS;
+     DWORD flags = context->ContextFlags & ~CONTEXT_AMD64;
+     BOOL self = (handle == GetCurrentThread());
+@@ -1192,7 +1198,10 @@
+         frame->rdi = context->Rdi;
+         frame->r8  = context->R8;
+         frame->r9  = context->R9;
+-        frame->r10 = context->R10;
++        if (frame->restore_flags & RESTORE_FLAGS_INSTRUMENTATION)
++            frame->r10 = context->Rip;
++        else
++            frame->r10 = context->R10;
+         frame->r11 = context->R11;
+         frame->r12 = context->R12;
+         frame->r13 = context->R13;
+@@ -1224,6 +1233,7 @@
+     }
+ 
+     frame->restore_flags |= flags & ~CONTEXT_INTEGER;
++    unblock_sigusr1();
+     return STATUS_SUCCESS;
+ }
+ 
+@@ -1234,6 +1244,8 @@
+  */
+ NTSTATUS WINAPI NtGetContextThread( HANDLE handle, CONTEXT *context )
+ {
++    block_sigusr1();
++
+     struct syscall_frame *frame = get_syscall_frame();
+     DWORD needed_flags = context->ContextFlags & ~CONTEXT_AMD64;
+     BOOL use_cached_debug_regs = FALSE;
+@@ -1378,6 +1390,7 @@
+             amd64_thread_data()->dr7 = context->Dr7;
+         }
+     }
++    unblock_sigusr1();
+     set_context_exception_reporting_flags( &context->ContextFlags, CONTEXT_SERVICE_ACTIVE );
+     return STATUS_SUCCESS;
+ }
+@@ -2753,6 +2766,36 @@
+     abort_thread( 0 );
+ }
+ 
++/* block_sigusr1: Increment refcount to block deferred SIGUSR1 delivery.
++ * Call before any context access in a syscall handler to prevent a race. */
++static void block_sigusr1( void )
++{
++    amd64_thread_data()->sigusr1_blocked++;
++}
++
++/* unblock_sigusr1: Decrement refcount. If SIGUSR1 arrived while blocked,
++ * run the deferred handler now that we're outside the critical section. */
++static void unblock_sigusr1( void )
++{
++    struct amd64_thread_data *data = amd64_thread_data();
++
++    if (data->sigusr1_blocked > 0)
++        data->sigusr1_blocked--;
++    if (data->sigusr1_blocked == 0 && data->sigusr1_pending)
++    {
++        data->sigusr1_pending = 0;
++        deferred_sigusr1( get_syscall_frame() );
++    }
++}
++
++/* deferred_sigusr1: Rewind the syscall RIP so the instruction is re-executed
++ * after a deferred SIGUSR1 was delivered. Called with the current frame. */
++static void deferred_sigusr1( struct syscall_frame *frame )
++{
++    if (!frame) return;
++    frame->rip -= 2;  /* rewind past the syscall instruction */
++}
++
+ 
+ /**********************************************************************
+  *		usr1_handler
+@@ -2763,6 +2806,14 @@
+ {
+     ucontext_t *ucontext = init_handler( sigcontext );
+ 
++    /* If a SIGUSR1 arrived while we were blocking context access, queue it
++     * for deferred delivery and bail out. */
++    if (is_inside_syscall( RSP_sig(ucontext) ) && amd64_thread_data()->sigusr1_blocked)
++    {
++        amd64_thread_data()->sigusr1_pending = 1;
++        return;
++    }
++
+     if (is_inside_syscall( RSP_sig(ucontext) ))
+     {
+         struct syscall_frame *frame = get_syscall_frame();
+@@ -3399,6 +3450,14 @@
+                    __ASM_CFI(".cfi_remember_state\n\t")
+                    __ASM_CFI_CFA_IS_AT2(rcx, 0xa8, 0x01) /* frame->syscall_cfa */
+                    "leaq 0x70(%rcx),%rsp\n\t"      /* %rsp > frame means no longer inside syscall */
++                   "movq %rax,0xb8(%rcx)\n\t"      /* store frame->retval */
++                   "movb %gs:0x342,%al\n\t"        /* load sigusr1_pending (gs-relative) */
++                   "testb %al,%al\n\t"             /* if set, deliver deferred SIGUSR1 */
++                   "jz 5f\n\t"
++                   "pushq %rcx\n\t"                /* save frame ptr across call */
++                   "call " __ASM_NAME("deferred_sigusr1") "\n\t"
++                   "popq %rcx\n\t"                 /* restore frame ptr */
++                   "5:\n\t"
+ #ifdef __linux__
+                    "movb $1,0x340(%r13)\n\t"       /* amd64_thread_data()->syscall_dispatch */
+                    "movw 0x338(%r13),%dx\n"        /* amd64_thread_data()->fs */
+@@ -3503,12 +3562,14 @@
+                    "popfq\n\t"
+                    "iretq\n"
+                    /* RESTORE_FLAGS_INSTRUMENTATION */
+-                   "2:\tmovq %gs:0x330,%r10\n\t"  /* amd64_thread_data()->instrumentation_callback */
++                   "2:\tmovq 0x70(%rcx),%r11\n\t"  /* save frame->rip */
++                   "movq %gs:0x330,%r10\n\t"  /* amd64_thread_data()->instrumentation_callback */
+                    "movq (%r10),%r10\n\t"
+                    "test %r10,%r10\n\t"
+                    "jz 3b\n\t"
+                    "testl $0x2,%edx\n\t"          /* CONTEXT_INTEGER */
+                    "jnz 1b\n\t"
++                   "movq %r11,%r10\n\t"             /* restore frame->rip as r10 for NtSetContextThread */
+                    "xchgq %r10,(%rsp)\n\t"
+                    "pushq %r11\n\t"
+                    /* make sure that if trap flag is set the trap happens on the first instruction after iret */
+
