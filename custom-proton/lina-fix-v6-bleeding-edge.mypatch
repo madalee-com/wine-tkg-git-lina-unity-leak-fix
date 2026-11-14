@@ -84,7 +84,7 @@
      set_context_exception_reporting_flags( &context->ContextFlags, CONTEXT_SERVICE_ACTIVE );
      return STATUS_SUCCESS;
  }
-@@ -2755,6 +2772,37 @@
+@@ -2755,6 +2772,39 @@
  
  
  /**********************************************************************
@@ -111,8 +111,10 @@
 +}
 +
 +/* deferred_sigusr1: Rewind the syscall RIP so the instruction is re-executed
-+ * after a deferred SIGUSR1 was delivered. Called with the current frame. */
-+static void deferred_sigusr1( struct syscall_frame *frame )
++ * after a deferred SIGUSR1 was delivered. Called with the current frame.
++ * __attribute__((used)) prevents GCC DCE from dropping it, since its only
++ * non-static call site is inside unblock_sigusr1 and other refs are inline asm. */
++__attribute__((used)) static void deferred_sigusr1( struct syscall_frame *frame )
 +{
 +    if (!frame) return;
 +    frame->rip -= 2;  /* rewind past the syscall instruction */

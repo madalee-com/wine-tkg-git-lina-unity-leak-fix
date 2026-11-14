@@ -79,7 +79,7 @@ Subject: MORE HAX
 
 Index: a/Makefile.in
 ===================================================================
-@@ -1458,6 +1458,8 @@
+@@ -1515,6 +1515,8 @@
  .PHONY: redist
  redist: all
  	mkdir -p $(REDIST_DIR)
