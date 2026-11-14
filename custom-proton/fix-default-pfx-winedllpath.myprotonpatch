@@ -1,0 +1,9 @@
+--- a/default_pfx.py
++++ b/default_pfx.py
+@@ -126,7 +126,7 @@ def make_default_pfx(default_pfx_dir, dist_dir, arm64):
+     local_env["WINEPREFIX"] = default_pfx_dir
+     local_env["WINEDEBUG"] = "-all"
+-    local_env["WINEDLLPATH"] = libdir + "vkd3d"
++    local_env["WINEDLLPATH"] = libdir + "wine"
+     runtime_args = []
+ 
