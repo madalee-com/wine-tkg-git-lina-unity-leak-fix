@@ -4,6 +4,6 @@
      local_env["WINEPREFIX"] = default_pfx_dir
      local_env["WINEDEBUG"] = "-all"
 -    local_env["WINEDLLPATH"] = libdir + "vkd3d"
-+    local_env["WINEDLLPATH"] = libdir + "wine"
++    local_env["WINEDLLPATH"] = libdir + "wine/x86_64-windows:" + libdir + "wine/i386-windows"
      runtime_args = []
  
