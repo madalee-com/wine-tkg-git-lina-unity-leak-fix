@@ -27,7 +27,7 @@ jobs:
           echo '_ci_build="true"' >> proton-tkg.cfg
           sed -i 's/_PROTON_NAME_ADDON=""/_PROTON_NAME_ADDON="lina-unity-leak-patch-v6"/' proton-tkg-profiles/advanced-customization.cfg
           cp ../custom-proton/lina-fix-v6-bleeding-edge.mypatch ../wine-tkg-git/wine-tkg-userpatches/
-          cp ../custom-proton/fix-default-pfx-winedllpath.myprotonpatch ../wine-tkg-git/wine-tkg-userpatches/
+          cp ../custom-proton/fix-default-pfx-winedllpath.myprotonpatch proton-tkg/proton-tkg-userpatches/
           yes|./proton-tkg.sh
           cd built
           cd proton_tkg_e*
