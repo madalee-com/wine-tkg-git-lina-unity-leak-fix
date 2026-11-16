@@ -144,7 +144,7 @@
                     __ASM_CFI_CFA_IS_AT2(rcx, 0xa8, 0x01) /* frame->syscall_cfa */
                     "leaq 0x70(%rcx),%rsp\n\t"      /* %rsp > frame means no longer inside syscall */
 +                   "movq %rax,0xb8(%rcx)\n\t"      /* store frame->retval */
-+                   "movb %gs:0x342,%al\n\t"        /* load sigusr1_pending (gs-relative) */
++                   "movb 0x342(%r13),%al\n\t"      /* load sigusr1_pending (r13-relative) */
 +                   "testb %al,%al\n\t"             /* if set, deliver deferred SIGUSR1 */
 +                   "jz 5f\n\t"
 +                   "pushq %rcx\n\t"                /* save frame ptr across call */
